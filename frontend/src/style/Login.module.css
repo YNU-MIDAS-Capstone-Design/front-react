@@ -1,0 +1,61 @@
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+    padding: 93px 0 83px;
+    gap: 76px;
+}
+.loginBox{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 27px;
+}
+.infoBox{
+    width: 370px;
+    gap: 40px;
+    display: grid;
+}
+.infoItem{
+    border-bottom: 1px solid #000000; 
+    color: #8CA6C0;
+    padding-bottom: 8px;
+}
+.loginBtn{
+    width: 371px;
+    height: 56px;
+    border-radius: 4px;
+    background-color: #3B82F6;
+    border: #3B82F6;
+    color: #fafafa;
+    cursor: pointer;
+}
+.socialLogin{
+    display: grid;
+    text-align: center;
+    gap: 10px;
+}
+.logoBox{
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+.logo {
+    width: 63px;
+    height: 63px;
+    border-radius: 50px;
+    object-fit: cover;
+}
+.loginLink {
+    color: #000000;
+    text-decoration: underline;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+}
+.loginLink:hover {
+    text-decoration: none;
+    color: #1E40AF;
+}

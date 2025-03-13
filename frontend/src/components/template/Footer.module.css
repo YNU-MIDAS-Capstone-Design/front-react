@@ -1,0 +1,25 @@
+.wrapper{
+    height: 95px;
+    width: 1080px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin: auto;
+    padding: 35px 0;
+}
+.divider{
+    width: 1170px;
+    border-top: 0.5px solid #000000;
+    align-items: center;
+    margin: auto;
+}
+.copyRight{
+    display: flex;
+    justify-content: center;
+    color: #000929;
+}
+.social{
+    gap: 40px;
+    display: flex;
+}

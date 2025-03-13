@@ -1,5 +1,5 @@
 # 1. React 애플리케이션 빌드
-FROM node:20 AS build
+FROM node:14 AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install

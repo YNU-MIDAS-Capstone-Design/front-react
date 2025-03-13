@@ -1,0 +1,8 @@
+.wrapper{
+    display: flex;
+}
+
+.wrapper>main{
+    overflow: hidden;
+    width: 100%;
+}
