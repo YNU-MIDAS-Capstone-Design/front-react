@@ -1,0 +1,208 @@
+.View{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    margin-top: 60px;
+    margin-bottom: 200px;
+}
+
+.View_list{
+    margin-bottom: 290px;
+}
+
+.StyleBox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 600px;
+    height: 600px;
+    flex-wrap: nowrap;
+}
+
+.StageBox{
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    width: 85%;
+    gap: 8px;
+}
+
+.title{
+    display: flex;
+    align-items: center;
+    width: 85%;
+    font-size: 22px;
+    font-weight: bold;
+    color: rgb(51, 65, 85);
+}
+
+.MiddleBox{
+    display: flex;
+    width: 85%;
+    padding: 30px 0;
+    gap:  12px;
+    border-bottom: 1px solid rgb(140, 162, 192, 0.5);
+}
+
+.MiddleBox:nth-of-type(2), .MiddleBox:nth-of-type(3){
+    flex-wrap: wrap;
+}
+
+.MbtiBox{
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+}
+
+.MiddleBox:nth-last-of-type(2){
+    gap: 2px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.MiddleBox p{
+    height: 40px;
+    margin: 0 20px 0 0;
+    display: flex;
+    align-items: center;
+    border: none;
+    font-weight:bolder;
+}
+
+
+.StageDot{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+    border: 1px solid rgb(140, 162, 192, 0.6);
+    border-radius: 50%;
+    color: rgb(140, 162, 192, 0.6);
+    font-size: 14px
+}
+
+.Button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 15px;
+    color: rgb(140, 162, 192, 0.8);
+    background-color: rgb(140, 162, 192, 0.1);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.DoneBox{
+    display: flex;
+    justify-content: space-around;
+    width: 85%;
+    padding: 20px 0;
+}
+
+.DoneButton{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight:"bold";
+    cursor: pointer;
+    width: 40%;
+    height: 50px;
+    border: 2px solid rgb(140, 162, 192, 0.3);
+    border-radius: 15px;
+    font-size: 18px;
+    color: rgb(51, 65, 85, 0.5);
+}
+
+.MbtiButton{
+    width: 80px;
+    height: 90px;
+    border-radius: 20%;
+    font-size: 34px;
+    font-weight: bolder;
+}
+
+button{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px;
+    width: 160px;
+    height: 40px;
+    cursor: pointer;
+}
+
+button div{
+    width:10px;
+}
+
+ul{
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin: 5px 0;
+    width: 140px;
+    height: 90px;
+    overflow-y: scroll;
+    cursor: pointer;
+}
+
+.Dropdown{
+    border: 1.5px solid rgb(140, 162, 192, 0.6);
+    background-color: white;
+    color: rgb(140, 162, 192, 0.8);
+    font-size: 15px;
+}
+
+
+.DropList{
+    list-style-type: none;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    padding-left: 10px;
+}
+
+.DropList:hover{
+    background-color: rgb(140, 162, 192, 0.2);
+    color: rgb(140, 162, 192);
+}
+
+.Buttonclick{
+    font-weight: bolder;
+    background-color: #3B82F6;
+    color : rgba(255, 255, 255);
+    /* Click Design 2안
+    color: white;
+    background-color: rgb(140, 162, 192);*/
+}
+
+.hidden{
+    visibility: hidden;
+    border: none;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.visible{
+    visibility: visible;
+}
+
+ul::-webkit-scrollbar {
+    width: 5px;
+}
+
+ul::-webkit-scrollbar-thumb {
+    background-color: rgb(140, 162, 192);
+    border-radius: 4px;
+}
+
+ul::-webkit-scrollbar-track {
+    background-color: #ebe9e9;
+    border-radius: 4px;
+}

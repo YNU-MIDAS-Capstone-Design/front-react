@@ -3,6 +3,9 @@
 }
 
 .wrapper>main{
-    overflow: hidden;
+    overflow-y: visible;
     width: 100%;
 }
+
+
+
