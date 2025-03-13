@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import '../style/UserStyle.css';
+import styles from '../style/UserStyle.module.css';
 
 function UserStyle(){
     const stack=['C', 'Java', 'Python', 'Js', 'React', 'HTML/CSS', 'Spring', 'SQL', 'Kotlin' ,'TypeScript', '머신러닝', '데이터 분석', 'Android', 'iOS', 'Unity', 'Swift', 'Vue.js', 'Linux', 'JQuery'];
@@ -18,57 +18,57 @@ function UserStyle(){
 
     function stageDot(){
         const result=[];
-        for(let i=1; i<5; i++) result.push(<div className={"StageDot" + (stage>=i ? " Buttonclick" : "")}>{i}</div>)
+        for(let i=1; i<5; i++) result.push(<div className={`${styles.StageDot} ${stage>=i ? styles.Buttonclick : ""}`}>{i}</div>)
         return result; }
 
     function MbtiButton(mbti){
         const result=[];
         for(let i=0; i < mbti.length; i++)
-            result.push(<div className={'Button MbtiButton'+(select[mbti]===mbti[i] ? " Buttonclick" : "")} 
+            result.push(<div className={`${styles.Button} ${styles.MbtiButton} ${select[mbti]===mbti[i] ? styles.Buttonclick : ""}`} 
             onClick={()=>{setselect((prev)=>{return select[mbti]===mbti[i] ? {...prev, [mbti]:-1} : {...prev, [mbti]: mbti[i]}});}}>
             {mbti[i]}</div>)
         return result;}
     
     return(
-        <div className={"View" + (click==0 ? "" : " View_list")}>
-        <div className='StyleBox'>
-        <div className='StageBox'>
+        <div className={`${styles.View} ${click==0 ? "" : styles.View_list}`}>
+        <div className={styles.StyleBox}>
+        <div className={styles.StageBox}>
                 {stageDot()}
         </div>
-        <p className='title'>당신의 스타일을 알려주세요</p>
-        <div className='MiddleBox'>
+        <p className={styles.title}>당신의 스타일을 알려주세요</p>
+        <div className={styles.MiddleBox}>
             {stack.map((item, key)=>
                 <div onClick={()=>{setmultiselect((prev)=>[...prev,key])}} 
-                className={'Button'+ (isactive(key)%2 ? " Buttonclick" : "")}>{item}</div>)}
+                className={`${styles.Button} ${isactive(key)%2 ? styles.Buttonclick : ""}`}>{item}</div>)}
         </div>
-        <div className='MiddleBox'>
+        <div className={styles.MiddleBox}>
             {career.map((item, key)=>
             <div onClick={()=>{setselect((prev)=>{return select.care===key ? {...prev, care:-1} : {...prev, care:key}});}} 
-            className={'Button'+ (select.care===key ? " Buttonclick" : "")}>{item}</div>)}
+            className={`${styles.Button} ${select.care===key ? styles.Buttonclick : ""}`}>{item}</div>)}
         </div>
-        <div className='MiddleBox'>
-            <div className='MbtiBox'>{MbtiButton('EI')}</div>
-            <div className='MbtiBox'>{MbtiButton('SN')}</div>
-            <div className='MbtiBox'>{MbtiButton('TF')}</div>
-            <div className='MbtiBox'>{MbtiButton('JP')}</div>
+        <div className={styles.MiddleBox}>
+            <div className={styles.MbtiBox}>{MbtiButton('EI')}</div>
+            <div className={styles.MbtiBox}>{MbtiButton('SN')}</div>
+            <div className={styles.MbtiBox}>{MbtiButton('TF')}</div>
+            <div className={styles.MbtiBox}>{MbtiButton('JP')}</div>
         </div>
-        <div className='MiddleBox'>
-            <p className="Dropdown">위치</p>
+        <div className={styles.MiddleBox}>
+            <p className={styles.Dropdown}>위치</p>
             <div>
-            <button onClick={()=>{setclick(!click);}} className={'Dropdown'+(select.loca === -1 ? "": " Buttonclick")}>
+            <button onClick={()=>{setclick(!click);}} className={`${styles.Dropdown} ${select.loca === -1 ? "": styles.Buttonclick}`}>
                 <div></div>
                 {select.loca > -1 ?  `${locate[select.loca]}` : `시/도`}
                 <i class={click==0 ? "fas fa-caret-down xl" : "fas fa-caret-up xl"}></i>
             </button>
-            <ul className={click==0 ? 'hidden' : 'Dropdown visible'}>
+            <ul className={`${click==0 ? styles.hidden : `${styles.Dropdown} ${styles.visible}`}`}>
             {locate.map((item, key)=> 
-            <li className='DropList' onClick={()=>{setclick(!click); setselect((prev)=>{return {...prev,loca:key}})}}>{item}</li> )}
+            <li className={styles.DropList} onClick={()=>{setclick(!click); setselect((prev)=>{return {...prev,loca:key}})}}>{item}</li> )}
             </ul>
             </div>
         </div>
-        <div className="DoneBox">           
-            <div className="DoneButton">초기화</div>
-            <div className="DoneButton">적용</div>
+        <div className={styles.DoneBox}>           
+            <div className={styles.DoneButton}>초기화</div>
+            <div className={styles.DoneButton}>적용</div>
         </div> 
         </div>
         </div>
