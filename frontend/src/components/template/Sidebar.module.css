@@ -12,18 +12,22 @@
     margin-bottom: 15px;
 }
 
+.Navbox{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .data{
     font-size: 16px;
     font-weight: 600;
     color: rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    margin: 10px 0;
+    text-decoration: none;
 }
 
 .click{
     color: #3B82F6;
     font-size: 17px;
-    font-weight: 600;
 }
 
 .data:hover{
