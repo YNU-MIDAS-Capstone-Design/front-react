@@ -14,7 +14,7 @@ const Header = () =>{
                     <div>Join</div>
                 </div>
             </div>
-            <div className={styles.bottom}>
+            {/*<div className={styles.bottom}>
                 <div className = {styles.circle}>
                     <img src = {mapDisplay} style={{width: "40.59px", height: "58px"}}/>
                 </div>
@@ -25,7 +25,7 @@ const Header = () =>{
                 <div className={styles.ellipse} style={{width:"950px"}}>
                     프로젝트 검색
                 </div>
-            </div>
+            </div>*/}
         </div>
     )
 }
