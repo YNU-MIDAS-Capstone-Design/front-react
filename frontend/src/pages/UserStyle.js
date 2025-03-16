@@ -30,7 +30,7 @@ function UserStyle(){
         return result;}
     
     return(
-        <div className={`${styles.View} ${click==0 ? "" : styles.View_list}`}>
+        <div className={styles.View}>
         <div className={styles.StyleBox}>
         <div className={styles.StageBox}>
                 {stageDot()}

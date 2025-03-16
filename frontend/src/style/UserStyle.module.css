@@ -4,20 +4,14 @@
     width: 100%;
     height: auto;
     min-height: 100vh;
-    margin-top: 60px;
-    margin-bottom: 200px;
-}
-
-.View_list{
-    margin-bottom: 290px;
+    margin: 60px 0;
 }
 
 .StyleBox{
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 600px;
-    height: 600px;
+    width: 800px;
     flex-wrap: nowrap;
 }
 
@@ -27,21 +21,23 @@
     align-items: center;
     width: 85%;
     gap: 8px;
+    margin-bottom: 20px;
 }
 
 .title{
     display: flex;
     align-items: center;
     width: 85%;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: bold;
     color: rgb(51, 65, 85);
+    margin-bottom: 10px;
 }
 
 .MiddleBox{
     display: flex;
     width: 85%;
-    padding: 30px 0;
+    padding: 40px 0;
     gap:  12px;
     border-bottom: 1px solid rgb(140, 162, 192, 0.5);
 }
@@ -50,10 +46,14 @@
     flex-wrap: wrap;
 }
 
+.MiddleBox:nth-of-type(4){
+    justify-content: center;
+}
+
 .MbtiBox{
     display: flex;
     flex-direction: column;
-    gap:10px;
+    gap: 10px;
 }
 
 .MiddleBox:nth-last-of-type(2){
@@ -71,7 +71,6 @@
     font-weight:bolder;
 }
 
-
 .StageDot{
     display: flex;
     justify-content: center;
@@ -88,11 +87,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px 15px;
+    padding: 6px 16px;
     color: rgb(140, 162, 192, 0.8);
     background-color: rgb(140, 162, 192, 0.1);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -101,7 +100,7 @@
     display: flex;
     justify-content: space-around;
     width: 85%;
-    padding: 20px 0;
+    padding: 40px 0;
 }
 
 .DoneButton{
@@ -119,10 +118,10 @@
 }
 
 .MbtiButton{
-    width: 80px;
-    height: 90px;
+    width: 90px;
+    height: 100px;
     border-radius: 20%;
-    font-size: 34px;
+    font-size: 38px;
     font-weight: bolder;
 }
 
