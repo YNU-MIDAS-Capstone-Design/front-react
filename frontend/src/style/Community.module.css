@@ -1,0 +1,160 @@
+/* ✅ 전체 컨테이너 */
+.communityContainer {
+  display: flex;
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+/* ✅ 사이드바 */
+.sidebar {
+  width: 194px;
+  padding-top: 50px;
+  padding-left: 40px;
+  border-right: 1px solid #b5b3b3;
+}
+
+.sidebarTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.navLink {
+  font-size: 18px;
+  font-weight: 700;
+  color: #b5b3b3;
+  padding: 8px 0;
+  text-decoration: none;
+}
+
+.navLink.active {
+  color: #3B82F6;
+}
+
+/* ✅ 팀 콘텐츠 */
+.teamContent {
+  flex: 1;
+  padding: 40px 0 0 57px;
+}
+
+.teamHeading {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 69px;
+}
+
+.teamCards {
+  display: flex;
+  flex-direction: column;
+  gap: 71px;
+}
+
+/* ✅ 팀 멤버 카드 */
+.teamCard {
+  position: relative;
+  width: 1084px;
+  height: 150px;
+  border: 1px solid #7d7d7d;
+  border-radius: 20px;
+  padding: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.profileImage {
+  width: 128px;
+  height: 130px;
+  border-radius: 15px;
+  margin-right: 41px;
+  background-color: #f0f0f0;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.memberName {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.memberRole {
+  font-size: 24px;
+  font-weight: 400;
+  padding: 4px 15px;
+  border: 1px solid #7d7d7d;
+  border-radius: 20px;
+}
+
+.memberTags {
+  font-size: 24px;
+  color: #000;
+}
+
+/* ✅ 날짜 아이콘 */
+.dateIcon {
+  position: absolute;
+  top: 23px;
+  right: 19px;
+  width: 51px;
+  height: 51px;
+}
+
+/* ✅ 반응형 */
+@media (max-width: 991px) {
+  .teamCard {
+    width: 90%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .teamCard {
+    padding: 20px;
+    height: auto;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profileImage {
+    margin: 0 0 20px 0;
+  }
+
+  .cardContent {
+    align-items: center;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .memberTags {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    display: none;
+  }
+
+  .teamContent {
+    padding: 20px;
+  }
+}

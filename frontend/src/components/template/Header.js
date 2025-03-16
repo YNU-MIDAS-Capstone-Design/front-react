@@ -1,16 +1,19 @@
 import styles from "./Header.module.css"
 import mapDisplay from "../../assets/mapDisplay.png"
 import MenuIcon from '@mui/icons-material/Menu';
+import { Link } from "react-router-dom";
 
 const Header = () =>{
     return (
         <div className={styles.wrapper}>
             <div className={styles.top}>
-                <div className={styles.logo}>Dev Match</div>
+            <Link to="/" className={styles.logo}>
+            Dev Match
+            </Link>
                 <div className={styles.items}>
                     <div>Project</div>
-                    <div>Community</div>
-                    <div>Login</div>
+                    <Link to="/community" className={styles.link}>Community</Link>
+                    <Link to="/login" className={styles.link}>Login</Link>
                     <div>Join</div>
                 </div>
             </div>
