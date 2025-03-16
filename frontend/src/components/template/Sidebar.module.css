@@ -1,0 +1,32 @@
+.bar{
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    width: 104px;
+    text-align: right;
+    padding-right: 40px;
+    margin-right: 10px;
+}
+
+.title{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.data{
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.click{
+    color: #3B82F6;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.data:hover{
+    font-size: 17px;
+}
+
