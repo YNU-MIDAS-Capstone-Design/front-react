@@ -4,6 +4,7 @@ import styles from "../style/Home.module.css";
 import banner1 from "../assets/banner.png";
 import banner2 from "../assets/banner2.png";
 import MenuIcon from "@mui/icons-material/Menu";
+import Modal from "../components/modal";
 
 const banners = [banner1, banner2];
 
@@ -113,6 +114,8 @@ const Home = () => {
     }));
   };
 
+  const [modal, setmodal] = useState(-1);
+
   return (
     <>
       <div className={styles.HomeContainer}>
@@ -202,8 +205,10 @@ const Home = () => {
         </button>
 
         {/* Alarm 버튼 */}
-        <button className={styles.alarmButton}></button>
-
+        <button className={`${styles.alarmButton} ${!modal||modal===-1 ? styles.alarmButtonstar : styles.alarmButtonX}`} 
+        onClick={()=>{modal===-1 ? setmodal(true) : setmodal(!modal)} }></button>
+        <Modal isOpen={modal}></Modal>
+        
         {/* ✅ 구인글 슬라이드 */}
         {[
           {
