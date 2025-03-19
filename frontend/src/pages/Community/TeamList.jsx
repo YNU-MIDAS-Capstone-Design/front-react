@@ -1,30 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import styles from "../../style/Community.module.css"; // 스타일 가져오기
 import { NavLink } from "react-router-dom";
-import Header from "../../components/template/Header";
-import ScheduleModal from "./ScheduleModal";
 
 const TeamList = () => {
-  // ✅ 각 팀원의 캘린더 모달 상태 관리
-  const [openCalendars, setOpenCalendars] = useState({
-    owner: false,
-    member: false,
-  });
-
-  // ✅ 특정 팀원의 캘린더 열기
-  const openCalendar = (role) => {
-    setOpenCalendars((prev) => ({ ...prev, [role]: true }));
-  };
-
-  // ✅ 특정 팀원의 캘린더 닫기
-  const closeCalendar = (role) => {
-    setOpenCalendars((prev) => ({ ...prev, [role]: false }));
-  };
-
   return (
     <>
-      <Header />
       <main className={styles.communityContainer}>
         {/* ✅ 사이드바 */}
         <aside className={styles.sidebar}>
@@ -66,22 +47,16 @@ const TeamList = () => {
               role="owner"
               tags="#STACK #STACK"
               dateIconUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/103cc1a00f60d8b901a4b38e22e3ecfb61f172a4"
-              openCalendar={() => openCalendar("owner")}
             />
             <TeamMemberCard
               name="NAME"
               role="member"
               tags="#STACK #STACK"
               dateIconUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/103cc1a00f60d8b901a4b38e22e3ecfb61f172a4"
-              openCalendar={() => openCalendar("member")}
             />
           </div>
         </section>
       </main>
-
-      {/* ✅ 각각의 일정 관리 모달 (owner & member) */}
-      <ScheduleModal isOpen={openCalendars.owner} onClose={() => closeCalendar("owner")} />
-      <ScheduleModal isOpen={openCalendars.member} onClose={() => closeCalendar("member")} />
     </>
   );
 };
