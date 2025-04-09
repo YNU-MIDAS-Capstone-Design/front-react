@@ -1,0 +1,44 @@
+.authorBar{
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    cursor: pointer;
+}
+.title{
+    font-size: 24px;
+    line-height: 30px;
+}
+.member{
+    color: #3B82F6;
+    font-size: 20px;
+    line-height: 24px;
+}
+.volunteer{
+    color: #B5B3B3;
+    font-size: 20px;
+}
+.button{
+    background-color: transparent;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: underline solid #8CA2C0;
+    color: #8CA2C0;
+    border: none;
+    width: fit-content;
+    padding: 25px;
+}
+.modalBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 2px solid #888;
+    box-shadow: 24;
+    padding: 24px;
+    border-radius: 8px;
+    width: 300px;
+  }
+  

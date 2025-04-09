@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import UserStyle from "./pages/UserStyle";
 import Mypage from "./pages/Mypage";
 import TeamList from "./pages/Community/TeamList";
+import Post from "./pages/Post";
+import CreatePost from "./pages/CreatePost";
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
           <Route path="/Userstyle" element={<UserStyle />} />
           <Route path="/Mypage" element={<Mypage />} />
           <Route path="/community/teamlist" element={<TeamList />} />
+          <Route path="/Post" element={<Post />} />
+          <Route path="/CreatePost" element={<CreatePost />} />
         </Routes>
       </Template>
     </Router>

@@ -5,6 +5,7 @@ import banner1 from "../assets/banner.png";
 import banner2 from "../assets/banner2.png";
 import MenuIcon from "@mui/icons-material/Menu";
 import Modal from "../components/modal";
+import AlarmButton from "../components/alarmButton/AlarmButton";
 
 const banners = [banner1, banner2];
 
@@ -114,7 +115,7 @@ const Home = () => {
     }));
   };
 
-  const [modal, setmodal] = useState(-1);
+  const [modal, setmodal] = useState(false);
 
   return (
     <>
@@ -205,9 +206,9 @@ const Home = () => {
         </button>
 
         {/* Alarm 버튼 */}
-        <button className={`${styles.alarmButton} ${!modal||modal===-1 ? styles.alarmButtonstar : styles.alarmButtonX}`} 
-        onClick={()=>{modal===-1 ? setmodal(true) : setmodal(!modal)} }></button>
-        <Modal isOpen={modal}></Modal>
+        <button className={`${styles.alarmButton} ${modal ? styles.alarmButtonX : styles.alarmButtonstar}`} 
+        onClick={() => setmodal((prev) => !prev)}></button>
+        <AlarmButton isOpen={modal} onClose={() => setmodal(false)} />
         
         {/* ✅ 구인글 슬라이드 */}
         {[
