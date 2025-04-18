@@ -1,0 +1,117 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 6000;
+}
+
+.modalContainer {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+
+.stackGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, auto));
+  justify-content: center; /* ✅ 전체 그리드를 가운데로 모으기 */
+  gap: 10px 10px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+
+.stackTag {
+  display: flex;
+  padding: 6px 12px;
+  border-radius: 20px;
+  max-width: 100px;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  color: #444;
+  font-weight: 500;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.stackTag:hover {
+  background-color: #e0e0e0;
+}
+
+.stackTag.active {
+  background-color: #7295ef;
+  color: white;
+  font-weight: bold;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.resetButton {
+  padding: 10px 18px;
+  border: none;
+  background-color: #f2f2f2;
+  color: #333;
+  border-radius: 20px;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+}
+
+.applyButton {
+  padding: 10px 18px;
+  border: none;
+  background-color: #7295ef;
+  color: white;
+  font-weight: bold;
+  border-radius: 20px;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+}
+
+.closeButtonWrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.closeButton {
+  transform: translateX(30%);
+  background: none;
+  border: none;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  padding: 8px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
