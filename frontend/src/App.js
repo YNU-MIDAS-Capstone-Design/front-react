@@ -9,6 +9,8 @@ import Mypage from "./pages/Mypage";
 import TeamList from "./pages/Community/TeamList";
 import Post from "./pages/Post";
 import CreatePost from "./pages/CreatePost";
+import Project from "./pages/Project";
+
 
 function App() {
   return (
@@ -23,6 +25,7 @@ function App() {
           <Route path="/community/teamlist" element={<TeamList />} />
           <Route path="/Post" element={<Post />} />
           <Route path="/CreatePost" element={<CreatePost />} />
+          <Route path="/project" element={<Project />} />
         </Routes>
       </Template>
     </Router>
