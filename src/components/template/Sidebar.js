@@ -11,7 +11,7 @@ const Sidebar = ({title, dataarray, link})=>{
             <p className={styles.title}>{title}</p>
             <div className={styles.Navbox}>
                 {dataarray.map((data, key)=>
-                    <NavLink to={link[key]} onClick={()=>{setclick(data); }} 
+                    <NavLink key={key} to={link[key]} onClick={()=>{setclick(data); }} 
                     className={`${styles.data} ${click===data ? styles.click : ""}`}>{data}</NavLink>
                 )}
             </div>
