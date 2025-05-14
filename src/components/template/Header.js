@@ -12,8 +12,11 @@ const Header = () => {
           <Link to="/project" className={styles.noUnderline}>
             Project
           </Link>
-          <Link to="/community/teamlist" className={styles.noUnderline}>
+          <Link to="/team" className={styles.noUnderline}>
             Community
+          </Link>
+          <Link to="/mypage" className={styles.noUnderline}>
+            Mypage
           </Link>
           <Link to="/login" className={styles.noUnderline}>
             Login
