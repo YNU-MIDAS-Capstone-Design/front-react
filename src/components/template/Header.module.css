@@ -1,0 +1,53 @@
+.wrapper {
+  position: sticky;
+  top: 0;
+  min-width: 1440px;
+  background-color: rgb(245, 245, 245);
+  height: 80px;
+  box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+  z-index: 1100;
+}
+.top {
+  display: flex;
+  justify-content: space-between; /* 양쪽 정렬 */
+  align-items: center; /* 수직 가운데 정렬 */
+  padding: 0 50px;
+  height: 100%;
+}
+.logo {
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.items {
+  display: flex;
+  gap: 20px;
+}
+.logo {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+}
+.logo:hover {
+  color: #3b82f6;
+}
+
+.noUnderline {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+}
+.noUnderline:hover {
+  color: #3b82f6;
+}
+.items div {
+  cursor: pointer;
+  font-size: 16px;
+}
+.bottom {
+  height: 93px;
+  display: flex;
+  padding-left: 83px;
+  align-items: center;
+  gap: 20px;
+}

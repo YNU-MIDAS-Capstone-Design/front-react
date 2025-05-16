@@ -1,0 +1,86 @@
+.commentInput{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.reply{
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+}
+.commentCount{
+    color: #939393;
+    padding-left: 10px;
+}
+.inputComment{
+    padding: 1rem 1rem 1.5rem;
+    outline: none;
+    border: 2px solid #e1e1e1;
+    border-radius: 16px;
+    width: 100%;
+    min-height: 100px;
+    margin-bottom: 10px;
+    resize: none;
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.buttonWrapper{
+    display: flex;
+    justify-content: flex-end;
+    margin: 16px 0 24px;
+}
+.submitButton{
+    padding: 12px 24px;
+    height: 40px;
+    background: #333;
+    border-radius: 50px;
+    font-weight: 700;
+    color: #fff;
+    font-size: 18px;
+    width: fit-content;
+}
+li{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.commentList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: fit-content;
+}
+.commentContainer{
+    display: flex;
+    flex-direction: column;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e1e1e1
+}
+.commentHeader{
+    display: flex;
+    justify-content: space-between;
+}
+.commentInfo{
+    display: flex;
+    flex-direction: column;
+}
+.commentUserName{
+    color: #333;
+    font-weight: 700;
+    font-size: 20px;
+}
+.commentDate{
+    font-size: 18px;
+    line-height: 126.5%;
+    letter-spacing: -.005em;
+    color: #9f9f9f;
+}
+.commentContent{
+    font-size: 1.125rem;
+    line-height: 1.7;
+    letter-spacing: -.004em;
+    word-break: break-all;
+    overflow-wrap: visible;
+}

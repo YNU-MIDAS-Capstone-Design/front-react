@@ -1,0 +1,127 @@
+.wrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: auto;
+    min-height: 100vh;
+    width: 100%;
+    margin: 60px 0;
+}
+
+p{ margin: 0; }
+
+.innerbox{
+    display: flex;
+    flex-direction: row;
+    width: 936px;
+    font-size: 18px;
+    padding-left: 20px;
+}
+
+.profilebox{
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    width: 260px;
+}
+
+.profilebox:first-of-type{
+    align-items: center;
+}
+
+.profilebox:nth-of-type(2){
+    width: 566px;
+    gap: 50px;
+    margin-left: 30px;
+}
+
+.profileImg{
+    width: 220px;
+    height: 220px;
+    margin-bottom: 30px;
+    border-radius: 50%;
+}
+
+.profileEdit{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 150px;
+    height: 35px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.nickname{
+    font-size: 30px;
+    margin-bottom: 20px;
+    width: 180px;
+    text-align: center;
+}
+
+.profilebox_left{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 220px;
+    overflow-wrap: break-word;
+}
+
+.profilebox_left_section{
+    display: flex;
+    flex-direction: column;
+    margin: 0 20px;
+    gap: 6px;
+}
+
+.profilebox_section{
+    margin-bottom: 30px;
+}
+
+.title{
+    font-size: 26px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.Imgsection{
+    display: flex;
+    gap: 10px
+}
+
+.TeamImg{
+    width: 30px;
+    height: 30px;
+    background-color: rgb(59, 130, 246, 0.5);
+    border-radius: 6px;
+}
+
+.PinImg{
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+}
+
+.TeamImg:first-of-type{
+    background-color: rgb(59, 130, 246);
+}
+
+.stack{
+    display:flex;
+    gap: 20px;
+}
+
+.line{
+    width: 90%;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin: 10px 0 15px 0;
+}
+
+
+
