@@ -2,7 +2,7 @@ import * as yorkie from 'yorkie-js-sdk'
 
 /*──────────────── Yorkie 문서 연결 ────────────────*/
 export async function initYorkie(docKey = 'root') {
-    const client = new yorkie.Client('http://localhost:8080')
+    const client = new yorkie.Client('http://localhost:8081')
     await client.activate()                   // 내부 sync-loop 자동 수행
 
     const doc = new yorkie.Document(docKey)   // ← 보드 ID == 문서 키
