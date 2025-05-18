@@ -235,7 +235,7 @@ function Member(props){
         <div onClick={(e)=>{if(modify){preventClick(e);} else {setclick(!click); getMemberlist(); setclick_pos(-1); } }} className={styles.Teamcard}>
             <div className={styles.Teamimg} style={{backgroundColor: bgColor}}></div>
             <div className={styles.Teamdata}>
-                <p>{Team.team_name}</p>
+                <p style={{width: "650px", maxwidth:"650px", overflow:"hidden", whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{Team.team_name}</p>
             <div className={styles.rolebadge}>{Team.owner ? "owner" : "member"}</div>
             <div className={styles.TeamSet} onClick={(e) => {e.stopPropagation();}}>
                 {Team.owner&& <i onClick={(e) => {setclick_pos(-1); Team.owner ? setmodify(!modify) : e.preventDefault()}} className="fas fa-pen fa-xl" style={{height:"20px", width:"20px", opacity:"0.4"}}/>}
@@ -243,7 +243,7 @@ function Member(props){
             </div>
         </div>
         </>
-)
+        )
     }
 
     /* ✅ 팀원 추가 모달  */

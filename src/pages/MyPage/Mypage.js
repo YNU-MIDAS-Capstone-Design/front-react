@@ -2,13 +2,12 @@ import { useState, useEffect } from "react"
 import Sidebar from "../../components/template/Sidebar"
 import styles from "../../style/Mypage.module.css"
 import profile from "../../assets/profile.jpg"
-import locate from "../../assets/locationdot.png"
 import git from "../../assets/github-brands.svg"
 import axios from 'axios'
-import { style } from "@mui/system"
 
 function Mypage(){
     const[click, setclick] = useState(0); //position list click state 관리
+    const[stack_click, setstack_click] = useState(0); //position list click state 관리
     const[edit, setedit]=useState(0); //Edit profile
     const[user, setuser] = useState([]); //user info 관리
     const [selectedLocation, setSelectedLocation] = useState(user.location); //user location
@@ -60,6 +59,9 @@ function Mypage(){
     ];
     const locate=['경기도', '강원도', '충청북도', '충청남도', '전라북도', '전라남도', '경상북도', '경상남도'];
 
+    const images = require.context('../../assets/stack', false, /\.png$/);
+
+
     useEffect(() => {
         const fetchUser = async () => {
           const token = localStorage.getItem('accessToken');
@@ -104,7 +106,7 @@ function Mypage(){
         const updatedUser = { ...user, location: selectedLocation, techStacks: stack}; //user location 반영
         console.log(updatedUser);
         try {
-          const res = await axios.put('/api/users/me', updatedUser,
+          const res = await axios.patch('/api/users/me', updatedUser,
             {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -179,10 +181,10 @@ function Mypage(){
     return(
         <div className={styles.wrapper}>
             {/*Sidebar*/}
-            <Sidebar title="MY PAGE" dataarray={["MY PROFILE", "좋아요 한 글", "작성한 글"]} link={["/Mypage", "/Likedpage", "/Mypage"]}></Sidebar>
+            <Sidebar title="MY PAGE" dataarray={["MY PROFILE", "내 활동"]} link={["/Mypage", "/Likedpage"]}></Sidebar>
             
             {/*User info*/}
-            <form onSubmit={modifyUser} className={styles.innerbox}>
+            <form onSubmit={(e)=>{setstack_click(0); modifyUser(e)}} className={styles.innerbox}>
 
                 {/*User info-left*/}
                 <div className={styles.profilebox}>
@@ -235,10 +237,10 @@ function Mypage(){
                             <div style={{display:"flex",alignItems:"center", gap: "3px"}}>
                                 {edit==0? <p className={styles.inputbox} style={{padding:"6px", paddingLeft:"0", overflow:"hidden", height:"22.4px"}}>{user.location}</p> : 
                                 <div>
-                                  <div onClick={()=>{setclick(!click);}} className={`${styles.loc_drop} ${styles.Dropdown} `} style={click ? {color: "rgba(0,0,0,0.6)", border: "2px solid rgb(73, 119, 236)"} : {color: "rgba(0,0,0,0.6)"}}>
+                                  <div onClick={()=>{setclick(!click);}} className={`${styles.loc_drop} ${styles.Dropdown} `} style={click ? {color: "rgba(0,0,0,0.6)", border: "2px solid rgb(73, 119, 236)", cursor: "pointer"} : {color: "rgba(0,0,0,0.6)", cursor: "pointer"}}>
                                       <div ></div>
                                       {selectedLocation == null ? `시/도` : `${selectedLocation}`}
-                                      <i className={click==0 ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} ></i>
+                                      <i className={click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} ></i>
                                   </div>
                                   <ul className={`${styles.loc_ul} ${click==0 ? styles.hidden : `${styles.Dropdown} ${styles.visible}`}`}>
                                     {locate.map((item, key)=> 
@@ -254,19 +256,63 @@ function Mypage(){
                 <div className={styles.profilebox}>
                     {/*User Tech Stack*/}
                     <div className={styles.profilebox_section}>
+                      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
                         <p className={styles.title}>TECH STACK</p>
+                        <div onClick={()=>{setstack_click(!stack_click)}} style={{width:"50px", height:"100%", cursor:"pointer", textAlign:"center"}}>
+                          <i className={!edit ? "" : stack_click ? "fas fa-caret-down" : "fas fa-caret-up"} style={{fontSize:"1.2rem"}}></i>
+                        </div>
+                      </div>
                         <div className={styles.line}></div>
                         <div className={styles.stack}>
-                            {edit==0?<p className={styles.inputbox} style={{width: "100%", height:"80px", padding:"3px"}}>{user.techStacks}</p> : 
-                            <textarea className={styles.inputbox_click} style={{width: "100%", height:"80px", padding:"3px 6px"}} 
-                            value={user.techStacks} onChange={(e) => {
-                              setuser({ ...user, techStacks: e.target.value });
-                            }}></textarea>}
-                    </div>
+                              {user.techStacks?.map((item, key)=>{
+                              let imgSrc;
+                              try{
+                                imgSrc = images(`./${item}.png`);
+                              }catch (e) {
+                                imgSrc = '';
+                              }
+                              return(
+                                <div key={key} className={`${styles.stack_btn}`} 
+                                  onClick={()=>{
+                                    if(edit) {
+                                      const updatedStacks = user.techStacks.filter(i => i !== item);
+                                      setuser({...user, techStacks: updatedStacks});
+                                    }
+                                  } }>
+                                  {edit ? <p style={{marginLeft: "-3px",marginRight:"4px", fontSize:"1rem", opacity:"0.8"}}>X</p> : ""}
+                                  <img alt="" src={imgSrc} style={{width:"23px", height:"23px", marginRight:"5px"}}/>
+                                      {item==="C_SHARP" ? "C#" : item==="C_PLUS" ? "C+" : item==="HTML" ? "HTML5" : item==="CSS" ? "CSS3" : item}
+                                </div>
+                              ) })}
+                            
+                        </div>
+                       
+                        <div className={edit && stack_click ? `${styles.MiddleBox}` : `${styles.MiddleBox} ${styles.hidden}`}>
+                                        {stack
+                                        .filter(item => !user.techStacks?.includes(item))
+                                        .map((item, key)=>{
+                                            let imgSrc;
+                                            try{
+                                              imgSrc = images(`./${item}.png`);
+                                            }catch (e) {
+                                              imgSrc = '';
+                                            }
+                                            return <div key={key}
+                                            onClick={()=>{
+                                              if(edit){
+                                                const updatedStacks = [...(user.techStacks || []), item];
+                                                setuser({...user, techStacks: updatedStacks});
+                                              }
+                                            }}
+                                            className={`${styles.Button}`}>
+                                            <img alt="" src={imgSrc} style={{width:"23px", height:"23px", marginLeft:"-5px", marginRight:"5px"}}/>
+                                            {item==="C_SHARP" ? "C#" : item==="C_PLUS" ? "C+" : item==="HTML" ? "HTML5" : item==="CSS" ? "CSS3" : item}</div>}  )}
+                        </div>
+                        
 
                     {/*User Styles*/}
                     </div>
-                    <div className={styles.profilebox_section} style={{height:"170px"}}>
+                    <div className={styles.profilebox_section} style={{height:"170px", marginBottom:"30px"}}>
                         <p className={styles.title}>BIO</p>
                         <div className={styles.line}></div>
                         {edit==0?<p className={styles.inputbox} style={{width: "100%", height:"100px", padding:"3px"}}>{user.bio}</p> : 
@@ -275,14 +321,16 @@ function Mypage(){
                     </div>
 
                     {/*User Profile*/}
-                    <div className={styles.profilebox_section} >
+                    <div className={styles.profilebox_section} style={{marginBottom:"30px"}}>
                         <p className={styles.title}>TEAM</p>
                         <div className={styles.line}></div>
+                        <div style={{display:"flex", flexWrap: "wrap"}}>
                         {user.teams?.map((item, key)=>
-                            <div style={{display:"flex", alignItems:"center"}}>
-                                <div key={key} style={{backgroundColor: handlebgColor(item), width: "50px", height:"50px", borderRadius: "12px", marginBottom:"12px"}}></div>
-                                <p style={{marginBottom:"12.5px", marginLeft:"15px", height:"25px", color:"rgba(0,0,0,0.7)", fontWeight:"500"}}>{item}</p>
+                            <div style={{display:"flex", alignItems:"center", width: "50%"}}>
+                                <div key={key} style={{backgroundColor: handlebgColor(item), width: "50px", minWidth:"50px", height:"50px", borderRadius: "12px", marginBottom:"12px"}}></div>
+                                <p style={{marginBottom:"12.5px", marginLeft:"15px", maxwidth:"200px", height:"25px", color:"rgba(0,0,0,0.7)", fontWeight:"500",overflow:"hidden",whiteSpace:"nowrap", textOverflow:"ellipsis"}}>{item}</p>
                             </div>)}
+                            </div>
                     </div>
                 </div>
 
