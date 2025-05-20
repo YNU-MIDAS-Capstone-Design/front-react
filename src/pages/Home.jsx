@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import classNames from "classnames";
 import styles from "../style/Home.module.css";
 import axios from "axios";
-import banner1 from "../assets/banner.png";
-import banner2 from "../assets/banner2.png";
+import banner1 from "../assets/banner11.png";
+import banner2 from "../assets/banner22.png";
 import StackFilter from "../components/template/StackFilter";
 import SearchBar from "../components/template/Homesearch";
 
@@ -167,10 +167,15 @@ const Home = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navigate = useNavigate();
+  const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
     axios
-      .get("/api/jobs")
+      .get("/api/home", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         if (res.data.code === "SU") {
           setData({
@@ -185,8 +190,9 @@ const Home = () => {
       .catch((err) => {
         console.warn("백엔드 연동 실패. 더미 데이터를 사용합니다.");
         setData(dummyData);
-  
-        const isBackendError = err.response?.data?.code && err.response?.data?.message;
+
+        const isBackendError =
+          err.response?.data?.code && err.response?.data?.message;
         if (isBackendError) {
           const { code, message } = err.response.data;
           setErrorMessage(`[${code}] ${message}`);
@@ -195,12 +201,11 @@ const Home = () => {
         }
       });
   }, []);
-  
-  
 
   useEffect(() => {
     const handleScroll = () => {
-      const bannerHeight = document.querySelector(`.${styles.Banner}`)?.offsetHeight || 0;
+      const bannerHeight =
+        document.querySelector(`.${styles.Banner}`)?.offsetHeight || 0;
       const scrollThreshold = bannerHeight * 0.6;
       setIsHidden(window.scrollY < scrollThreshold);
     };
@@ -270,7 +275,8 @@ const Home = () => {
             <div key={job.project_id} className={styles.jobCard}>
               <button
                 className={classNames(styles.starButton, {
-                  [styles.active]: favorites[key]?.[index + slideState[key] * 3],
+                  [styles.active]:
+                    favorites[key]?.[index + slideState[key] * 3],
                 })}
                 onClick={() => toggleFavorite(key, index + slideState[key] * 3)}
               >
@@ -279,11 +285,16 @@ const Home = () => {
               <h3 className={styles.jobTitle}>{job.title}</h3>
               <p className={styles.jobDescription}>{job.description}</p>
               <div className={styles.stackList}>
-                {job.stackList?.map((stack, i) => (
+                {job.stackList?.slice(0, 3).map((stack, i) => (
                   <span key={i} className={styles.stackItem}>
                     {stack}
                   </span>
                 ))}
+                {job.stackList?.length > 3 && (
+                  <span className={styles.stackItem}>
+                    +{job.stackList.length - 3}
+                  </span>
+                )}
               </div>
             </div>
           ))}
@@ -327,8 +338,18 @@ const Home = () => {
             ))}
           </div>
         </nav>
-        <button className={styles.arrowButton + " " + styles.leftArrow} onClick={prevSlide}>◀</button>
-        <button className={styles.arrowButton + " " + styles.rightArrow} onClick={nextSlide}>▶</button>
+        <button
+          className={styles.arrowButton + " " + styles.leftArrow}
+          onClick={prevSlide}
+        >
+          ◀
+        </button>
+        <button
+          className={styles.arrowButton + " " + styles.rightArrow}
+          onClick={nextSlide}
+        >
+          ▶
+        </button>
       </section>
 
       {/* 검색바 */}
@@ -343,9 +364,19 @@ const Home = () => {
           keyword={searchKeyword}
           setKeyword={setSearchKeyword}
           onSearch={() => {
-            if (searchKeyword.trim() !== "") {
-              navigate(`/project?keyword=${encodeURIComponent(searchKeyword)}`);
+            const params = new URLSearchParams();
+
+            if (searchKeyword.trim()) {
+              params.append("keyword", searchKeyword.trim());
             }
+
+            selectedStacks.forEach((stack) => {
+              params.append("stacks", stack);
+            });
+
+            params.append("search", "1");
+
+            navigate(`/project?${params.toString()}`);
           }}
         />
       </div>
@@ -365,7 +396,12 @@ const Home = () => {
         className={classNames(styles.Match2, styles.fixed, {
           [styles.hidden]: isHidden,
         })}
-        style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
         <span style={{ fontSize: "16px" }}>마음에 드는 프로젝트가 없다면?</span>
         <span style={{ fontSize: "24px", fontWeight: "bold" }}>모집하기!</span>

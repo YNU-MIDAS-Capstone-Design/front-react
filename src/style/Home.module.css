@@ -1,20 +1,19 @@
 /* ✅ 전체 페이지 스타일 */
 .HomeContainer {
   width: 100%; /* 화면 전체를 차지하도록 설정 */
-  max-width: 1200px; /* ✅ 중앙 정렬을 위해 최대 너비 설정 */
+  max-width: 1600px;
   margin: 0 auto; /* ✅ 수평 중앙 정렬 */
   min-height: 100vh; /* 전체 화면 높이 유지 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 50px;
 }
 
 /* ✅ 배너 컨테이너 */
 .Banner {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
-  height: 368px;
+  height: 400px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -290,10 +289,9 @@
 
 /* ✅ 개별 구인글 카드 높이 줄이기 */
 .jobCard {
-  position: relative; /* ✅ 별(★)을 정확히 배치하기 위해 추가 */
+  position: relative;
   flex: 1;
-  min-height: 120px;
-  max-height: 140px;
+  min-height: 140px;
   border-radius: 20px;
   background-color: rgba(245, 245, 245, 1);
   padding: 12px 16px;
@@ -302,8 +300,7 @@
   justify-content: space-between;
   cursor: pointer;
   transition: background 0.3s ease;
-  text-align: left;
-  padding-right: 80px;
+  padding-right: 50px;
 }
 
 /* ✅ 구인글 제목 */
@@ -311,7 +308,7 @@
   font-size: 18px;
   font-weight: bold;
   text-align: left;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 /* ✅ 구인글 설명 */
@@ -372,7 +369,7 @@
 
 .cardHeader {
   position: absolute;
-  top: 12px;
+  top: 8px;
   right: 16px;
 }
 
@@ -386,7 +383,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap; /* 줄바꿈 허용 */
-  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .stackItem {

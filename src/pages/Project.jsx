@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styles from "../style/Project.module.css";
 import axios from "axios";
 import SearchBar from "../components/template/SearchBar";
@@ -22,7 +23,12 @@ const StarButton = ({ isActive, onClick }) => (
 );
 
 const ProjectRecruitmentCard = ({
-  id, title, description, roles, isFavorite, onFavoriteToggle,
+  id,
+  title,
+  description,
+  roles,
+  isFavorite,
+  onFavoriteToggle,
 }) => (
   <article className={styles.card} data-id={id}>
     <StarButton isActive={isFavorite} onClick={onFavoriteToggle} />
@@ -31,14 +37,24 @@ const ProjectRecruitmentCard = ({
     </header>
     <p className={styles.cardDescription}>{description}</p>
     <div className={styles.roleTags}>
-      {roles.map((role, index) => (
+      {roles.slice(0, 4).map((role, index) => (
         <RoleTag key={index} role={role} />
       ))}
+      {roles.length > 4 && (
+        <span className={styles.roleTag}>+{roles.length - 4}</span>
+      )}
     </div>
   </article>
 );
 
-const ProjectList = ({ selectedStacks, selectedRegions, processOnly, searchKeyword, order }) => {
+const ProjectList = ({
+  selectedStacks,
+  selectedRegions,
+  processOnly,
+  searchKeyword,
+  order,
+  searchTrigger,
+}) => {
   const [projects, setProjects] = useState([]);
   const [page, setPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -48,18 +64,73 @@ const ProjectList = ({ selectedStacks, selectedRegions, processOnly, searchKeywo
   const totalPages = Math.ceil(totalCount / limit);
 
   useEffect(() => {
+    const keyword = searchKeyword.trim();
+    if (
+      searchTrigger === 0 &&
+      selectedStacks.length === 0 &&
+      selectedRegions.length === 0 &&
+      searchKeyword.trim() === ""
+    ) {
+    }
+
     const params = new URLSearchParams();
     params.append("page", page);
     if (order) params.append("order", order);
     if (processOnly) params.append("process", "true");
     selectedRegions.forEach((region) => params.append("location", region));
     selectedStacks.forEach((stack) => params.append("stacks", stack));
-    if (searchKeyword) params.append("keyword", searchKeyword);
+    if (keyword) params.append("keyword", keyword);
 
-    axios.get(`http://localhost:8080/api/project?${params.toString()}`)
+    const token = localStorage.getItem("accessToken");
+
+    const isTokenExpired = (token) => {
+      if (!token) return true;
+
+      try {
+        const base64Url = token.split(".")[1]; // JWT payload 부분
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const payload = JSON.parse(window.atob(base64));
+
+        const exp = payload.exp;
+        const now = Math.floor(Date.now() / 1000); // 현재 시간 (초)
+
+        return exp < now;
+      } catch (e) {
+        console.error("토큰 디코딩 실패:", e);
+        return true; // 디코딩 실패 시 만료된 것으로 간주
+      }
+    };
+
+    if (!token || isTokenExpired(token)) {
+      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      // navigate("/login"); 등 처리
+    } else {
+      // 유효한 토큰 → API 요청 등 진행
+    }
+    console.log("🔐 accessToken:", token);
+
+    const query = [
+      `page=${page}`,
+      `order=${order}`,
+      processOnly ? `process=true` : null,
+      keyword ? `keyword=${encodeURIComponent(keyword)}` : null,
+      ...selectedRegions.map((r) => `location=${encodeURIComponent(r)}`),
+      ...selectedStacks.map((s) => `stacks=${encodeURIComponent(s)}`),
+    ]
+      .filter(Boolean)
+      .join("&");
+
+    axios
+      .get(`/api/project?${query}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         if (res.data.code === "SU") {
-          const fetchedProjects = res.data.projects || [];
+          const fetchedProjects = Array.isArray(res.data.projects)
+            ? res.data.projects
+            : [];
           setProjects(fetchedProjects);
           setTotalCount(res.data.totalCount || 0);
           setPage(res.data.page || 0);
@@ -70,70 +141,79 @@ const ProjectList = ({ selectedStacks, selectedRegions, processOnly, searchKeywo
           });
           setFavorites(initialFavorites);
         } else {
-          console.warn(`[${res.data.code}] ${res.data.message}`);
+          setProjects([]); // 실패 시 명시적으로 빈 배열
+          setTotalCount(0);
+          setPage(0);
         }
       })
-      .catch(() => {
-        console.warn("백엔드 연결 실패. 더미 데이터 사용 중.");
-        const dummyData = [
-          {
-            project_id: 1,
-            title: "더미 프로젝트",
-            description: "설명",
-            stackList: ["React", "Spring"],
-          },
-        ];
-        setProjects(dummyData);
-        setTotalCount(dummyData.length);
+      .catch((err) => {
+        console.warn("백엔드 연결 실패.");
+        setProjects([]);
+        setTotalCount(0);
         setPage(0);
-
-        const initialFavorites = {};
-        dummyData.forEach((project) => {
-          initialFavorites[project.project_id] = false;
-        });
-        setFavorites(initialFavorites);
       });
-  }, [page, selectedStacks, selectedRegions, processOnly, searchKeyword, order]);
+  }, [
+    searchTrigger, // 버튼 누를 때만 증가
+    page,
+    selectedStacks,
+    selectedRegions,
+    processOnly,
+    order,
+  ]);
 
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const isFiltered =
+    searchTrigger > 0 ||
+    selectedStacks.length > 0 ||
+    selectedRegions.length > 0 ||
+    searchKeyword.trim() !== "";
+
   return (
     <section className={styles.projectListWrapper}>
-      <div className={styles.projectList}>
-        {projects.map((project) => (
-          <ProjectRecruitmentCard
-            key={project.project_id}
-            id={project.project_id}
-            title={project.title}
-            description={project.description}
-            roles={project.stackList}
-            isFavorite={favorites[project.project_id]}
-            onFavoriteToggle={() => toggleFavorite(project.project_id)}
-          />
-        ))}
-      </div>
+      {projects.length === 0 && isFiltered ? (
+        <div className={styles.noResults}>검색 결과가 없습니다.</div>
+      ) : (
+        <>
+          <div className={styles.projectList}>
+            {projects.map((project) => (
+              <ProjectRecruitmentCard
+                key={project.project_id}
+                id={project.project_id}
+                title={project.title}
+                description={project.description}
+                roles={project.stackList}
+                isFavorite={favorites[project.project_id]}
+                onFavoriteToggle={() => toggleFavorite(project.project_id)}
+              />
+            ))}
+          </div>
 
-      <div className={styles.slideControls}>
-        <button
-          className={`${styles.arrowButton} ${styles.leftArrow}`}
-          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-          disabled={page === 0}
-        >
-          ◀
-        </button>
-        <span className={styles.pageInfo}>
-          {page + 1} / {totalPages}
-        </span>
-        <button
-          className={`${styles.arrowButton} ${styles.rightArrow}`}
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
-          disabled={page >= totalPages - 1}
-        >
-          ▶
-        </button>
-      </div>
+          <div className={styles.slideControls}>
+            <button
+              className={`${styles.arrowButton} ${styles.leftArrow}`}
+              onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+              disabled={page === 0}
+            >
+              ◀
+            </button>
+            <span className={styles.pageInfo}>
+              {page + 1} / {totalPages}
+            </span>
+            <button
+              className={`${styles.arrowButton} ${styles.rightArrow}`}
+              onClick={() =>
+                setPage((prev) => Math.min(prev + 1, totalPages - 1))
+              }
+              disabled={page >= totalPages - 1}
+            >
+              ▶
+            </button>
+          </div>
+        </>
+      )}
     </section>
   );
 };
@@ -153,18 +233,26 @@ const SortSelector = ({ order, setOrder }) => (
 );
 
 const Project = () => {
-  const [selectedStacks, setSelectedStacks] = useState([]);
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialKeyword = queryParams.get("keyword") || "";
+  const initialStacks = queryParams.getAll("stacks") || [];
+  const initialTrigger = queryParams.get("search") === "1" ? 1 : 0;
+  const [selectedStacks, setSelectedStacks] = useState(initialStacks);
   const [selectedRegions, setSelectedRegions] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isRegionOpen, setIsRegionOpen] = useState(false);
   const [processOnly, setProcessOnly] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(initialKeyword);
   const [order, setOrder] = useState("RECENT");
-  const [searchTrigger, setSearchTrigger] = useState(0);
+  const [searchTrigger, setSearchTrigger] = useState(initialTrigger);
 
   const handleRemoveTag = (tagToRemove) => {
     setSelectedStacks((prev) => prev.filter((tag) => tag !== tagToRemove));
-    setSelectedRegions((prev) => prev.filter((region) => region !== tagToRemove));
+    setSelectedRegions((prev) =>
+      prev.filter((region) => region !== tagToRemove)
+    );
   };
 
   return (
@@ -172,13 +260,22 @@ const Project = () => {
       <section className={styles.filterContainer}>
         <div className={styles.filterTopRow}>
           <div className={styles.filterButtons}>
-            <button className={styles.filterButton} onClick={() => setIsSearchOpen(true)}>
+            <button
+              className={styles.filterButton}
+              onClick={() => setIsSearchOpen(true)}
+            >
               기술 선택 ▾
             </button>
-            <button className={styles.filterButton} onClick={() => setIsRegionOpen(true)}>
+            <button
+              className={styles.filterButton}
+              onClick={() => setIsRegionOpen(true)}
+            >
               위치 선택 ▾
             </button>
-            <button className={styles.filterButton} onClick={() => setProcessOnly((prev) => !prev)}>
+            <button
+              className={styles.filterButton}
+              onClick={() => setProcessOnly((prev) => !prev)}
+            >
               {processOnly ? "전체 보기" : "모집 중만 보기"}
             </button>
           </div>
