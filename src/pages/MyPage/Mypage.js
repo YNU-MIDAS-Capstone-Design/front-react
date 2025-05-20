@@ -347,7 +347,7 @@ function Mypage(){
                         <div className={styles.profilebox_left_section}>
                             <p style={{fontWeight:"500", display:"flex", justifyContent:"space-between"}}>MBTI
                               {edit ? <i className={mbti_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} onClick={()=>setmbti_click(!mbti_click)} 
-                                    style={{marginLeft:"2px", opacity:"0.6", cursor:"pointer", marginTop:"2.5px", marginRight:"5px"}}></i> : ""}
+                                    style={{marginLeft:"2px", cursor:"pointer", marginTop:"2.5px", marginRight:"5px", ...(mbti_click ? {color:"rgb(73, 119, 236)"} : {opacity:"0.6"}) }}></i> : ""}
                             </p>
                             <div style={{display:"flex", alignItems:"center"}}>
                                 {!edit ? <div className={styles.inputbox} style={{display:"flex", alignItems:"center", gap:"6px", padding:"6px", paddingLeft:"0", overflow:"hidden"}}> 
@@ -356,7 +356,7 @@ function Mypage(){
                                     <div style={{display:"flex", width:"100%", gap:"5px", justifyContent: "center", alignContent: "center"}}>
                                       {Array.from(selectedmbti).map((char, index)=>{
                                       return (
-                                        <div key={index} className={styles.mbti_btn}>{char}</div>
+                                        <div key={index} className={styles.mbti_btn} onClick={()=>setmbti_click(1)}>{char}</div>
                                       )
                                     })}</div>
                                     {mbti_click ? <div style={{display:"flex", width:"100%", gap:"5px", justifyContent: "center", alignContent: "center"}}>
@@ -380,7 +380,7 @@ function Mypage(){
                                     <div onClick={()=>{setjob_click(!job_click);}} className={`${styles.loc_drop} ${styles.Dropdown} `} style={job_click ? {color: "rgba(0,0,0,0.6)", border: "2px solid rgb(73, 119, 236)", cursor: "pointer"} : {color: "rgba(0,0,0,0.6)", cursor: "pointer"}}>
                                         <div ></div>
                                         {selectedJob == null ? `직업` : `${selectedJob}`}
-                                        <i className={job_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} ></i>
+                                        <i className={job_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} style={{...(job_click ? {color:"rgb(73, 119, 236)"} : {})}}></i>
                                     </div>
                                     <ul className={`${styles.loc_ul} ${!job_click ? styles.hidden : `${styles.Dropdown} ${styles.visible}`}`}>
                                       {job.map((item, key)=> 
@@ -399,7 +399,7 @@ function Mypage(){
                                     <div onClick={()=>{setloc_click(!loc_click);}} className={`${styles.loc_drop} ${styles.Dropdown} `} style={loc_click ? {color: "rgba(0,0,0,0.6)", border: "2px solid rgb(73, 119, 236)", cursor: "pointer"} : {color: "rgba(0,0,0,0.6)", cursor: "pointer"}}>
                                         <div ></div>
                                         {selectedLocation == null ? `시/도` : `${selectedLocation}`}
-                                        <i className={loc_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} ></i>
+                                        <i className={loc_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} style={{...(loc_click ? {color:"rgb(73, 119, 236)"} : {})}}></i>
                                     </div>
                                     <ul className={`${styles.loc_ul} ${!loc_click ? styles.hidden : `${styles.Dropdown} ${styles.visible}`}`}>
                                       {locate.map((item, key)=> 
