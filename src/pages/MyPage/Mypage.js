@@ -4,6 +4,8 @@ import styles from "../../style/Mypage.module.css"
 import profile from "../../assets/profile.jpg"
 import git from "../../assets/github-brands.svg"
 import axios from 'axios'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 function Mypage(){
     /* ───────────────────────────────────────────── state ───────────────────────────────────────────── */
@@ -131,15 +133,24 @@ function Mypage(){
           if (selectedFile) {
             const form = new FormData();
             form.append("imageFile", selectedFile);
-            const imgRes = await axios.put("api/users/me/image", form, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type" : "multipart/form-data",
-              },
-            });
-            console.log(imgRes.data.data)
-            setUploadImgUrl(imgRes.data.data.imageUrl);
-            setSelectedFile(null);
+            try {
+              const imgRes = await axios.put("api/users/me/image", form, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type" : "multipart/form-data",
+                },
+              });
+              console.log(imgRes.data.data)
+              setUploadImgUrl(imgRes.data.data.imageUrl);
+              setSelectedFile(null);
+            } catch(err){
+              if (err.response) {
+                console.error("서버 응답 에러:", err.response.status, err.response.data);
+              } else {
+                console.error("요청 자체 실패:", err.message);
+              }
+            }
+            
           }
 
           setedit(()=>!edit);
@@ -438,7 +449,9 @@ function Mypage(){
                                       setuser({...user, techStacks: updatedStacks});
                                     }
                                   } }>
-                                  {edit ? <p style={{marginLeft: "-3px",marginRight:"4px", fontSize:"1rem", opacity:"0.8"}}>X</p> : ""}
+                                  {edit ?
+                                  <FontAwesomeIcon icon={faXmark} style={{marginLeft: "-3px",marginRight:"4px", fontSize:"0.9rem", opacity:"0.8"}}/> 
+                                   : ""}
                                   <img alt="" src={imgSrc} style={{width:"23px", height:"23px", marginRight:"5px"}}/>
                                       {item==="C_SHARP" ? "C#" : item==="C_PLUS" ? "C+" : item==="HTML" ? "HTML5" : item==="CSS" ? "CSS3" : item}
                                 </div>
