@@ -23,7 +23,7 @@ const Header = () => {
           {token? (<div className={styles.noUnderline} onClick={()=> {
             localStorage.removeItem("accessToken")
             window.location.reload();
-          }}>logout</div>) 
+          }}>Logout</div>) 
           :(<>
           <Link to="/login" className={styles.noUnderline}>
             Login

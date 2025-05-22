@@ -223,7 +223,7 @@ function Mypage(){
       const h = Math.floor(Math.random() * (maxHue - minHue)) + minHue;
       const s = Math.floor(Math.random() * 20) + 60; // 채도 
       const l = Math.floor(Math.random() * 20) + 75; // 밝기
-    
+
       return `hsl(${h}, ${s}%, ${l}%)`;
     };
 
@@ -522,8 +522,13 @@ function Mypage(){
                         <div style={{display:"flex", flexWrap: "wrap"}}>
                         {user.teams?.map((item, key)=>
                             <div key={key} style={{display:"flex", alignItems:"center", width: "50%"}}>
-                                <div style={{backgroundColor: handlebgColor(item), width: "50px", minWidth:"50px", height:"50px", borderRadius: "12px", marginBottom:"12px"}}></div>
-                                <p style={{marginBottom:"12.5px", marginLeft:"15px", maxwidth:"200px", height:"25px", color:"rgba(0,0,0,0.7)", fontWeight:"500",overflow:"hidden",whiteSpace:"nowrap", textOverflow:"ellipsis"}}>{item}</p>
+                                {item.imageUrl.startsWith('hsl(')
+                                 ? <div style={{backgroundColor: item.imageUrl, width: "50px", minWidth:"50px", height:"50px", borderRadius: "12px", marginBottom:"12px"}}></div>
+                                 : item.imageUrl.startsWith('http') 
+                                 ? <img src={item.imageUrl} alt="미리보기" style={{width: "50px", minWidth:"50px", height:"50px", borderRadius: "12px", marginBottom:"12px"}}></img> 
+                                 : <div style={{backgroundColor: getbgColor(), width: "50px", minWidth:"50px", height:"50px", borderRadius: "12px", marginBottom:"12px"}}></div>}
+                                <p style={{marginBottom:"12.5px", marginLeft:"15px", maxwidth:"200px", height:"25px", color:"rgba(0,0,0,0.7)", fontWeight:"500",overflow:"hidden",whiteSpace:"nowrap", textOverflow:"ellipsis"}}>
+                                  {item.teamName}</p>
                             </div>)}
                             </div>
                     </div>
