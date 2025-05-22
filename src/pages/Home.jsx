@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import classNames from "classnames";
 import styles from "../style/Home.module.css";
 import axios from "axios";
@@ -245,6 +245,10 @@ const Home = () => {
       slideState[key] * 3 + 3
     );
 
+    const handleProjectClick = (projectId) => {
+      navigate(`/Post/${Number(projectId)}`);
+    };
+
     return (
       <section className={styles.popularJobListings}>
         <header className={styles.sectionHeader}>
@@ -272,7 +276,7 @@ const Home = () => {
 
         <div className={styles.jobListingsContainer}>
           {jobsToShow.map((job, index) => (
-            <div key={job.project_id} className={styles.jobCard}>
+            <div key={job.project_id} className={styles.jobCard} onClick={() => handleProjectClick(job.project_id)}>
               <button
                 className={classNames(styles.starButton, {
                   [styles.active]:
@@ -392,6 +396,7 @@ const Home = () => {
       )}
 
       {/* 하단 모집 버튼 */}
+      <Link to="/CreatePost">
       <button
         className={classNames(styles.Match2, styles.fixed, {
           [styles.hidden]: isHidden,
@@ -406,6 +411,7 @@ const Home = () => {
         <span style={{ fontSize: "16px" }}>마음에 드는 프로젝트가 없다면?</span>
         <span style={{ fontSize: "24px", fontWeight: "bold" }}>모집하기!</span>
       </button>
+      </Link>
 
       <button className={styles.alarmButton}></button>
 

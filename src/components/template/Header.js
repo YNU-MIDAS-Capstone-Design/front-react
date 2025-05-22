@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Devmatch from "../../assets/DevMatch.png"
 
 const Header = () => {
+  const token = localStorage.getItem("accessToken");
   return (
     <div className={styles.wrapper}>
       <div className={styles.top}>
@@ -19,12 +20,19 @@ const Header = () => {
           <Link to="/mypage" className={styles.noUnderline}>
             Mypage
           </Link>
+          {token? (<div className={styles.noUnderline} onClick={()=> {
+            localStorage.removeItem("accessToken")
+            window.location.reload();
+          }}>logout</div>) 
+          :(<>
           <Link to="/login" className={styles.noUnderline}>
             Login
           </Link>
           <Link to="/register" className={styles.noUnderline}>
             Join
           </Link>
+          </>)
+          }
         </div>
       </div>
     </div>

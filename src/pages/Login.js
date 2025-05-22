@@ -32,7 +32,6 @@ const Login = () => {
     };
 
     const login =()=>{
-        console.log(info);
         axios.post("/api/auth/login",info,{
             headers: {
               'Content-Type': 'application/json'

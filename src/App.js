@@ -26,8 +26,9 @@ function App() {
           <Route path="/Mypage" element={<Mypage />} />
           <Route path="/Likedpage" element={<Likedpage />} />
           <Route path="/community/teamlist" element={<TeamList />} />
-          <Route path="/Post" element={<Post />} />
+          <Route path="/Post/:projectId" element={<Post />} />
           <Route path="/CreatePost" element={<CreatePost />} />
+          <Route path="/CreatePost/edit/:projectId" element={<CreatePost />} />
           <Route path="/project" element={<Project />} />
           <Route path="/team" element={<Team />} />
         </Routes>
