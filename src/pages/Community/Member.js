@@ -1,65 +1,130 @@
-import { useState, useEffect, useRef } from "react"
+import React from 'react';
+import { useState, useRef, useCallback } from "react"
 import styles from "../../style/Member.module.css"
 import profile from "../../assets/profile.jpg"
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleRight, faCamera, faEllipsisVertical, faMinus, faPen, faPlus } from "@fortawesome/free-solid-svg-icons";
 
+//>> Component
+/* ✅ 팀 카드  */
+const Teamcard = React.memo(({ Team, onClick, modify, setmodify, getbgColor, setclick_pos, setmodify_mem, modify_mem }) => {
+    return (
+    <div onClick={onClick} className={styles.Teamcard}>
+        {Team.team_image.startsWith('hsl(') ?
+        <div className={styles.Teamimg} style={{backgroundColor: Team.team_image}}></div> 
+      : Team.team_image.startsWith('http') ?
+        <img src={Team.team_image} alt="미리보기" className={styles.Teamimg}></img>
+      : <div className={styles.Teamimg} style={{backgroundColor: getbgColor()}}></div> }
+
+        <div className={styles.Teamdata}>
+            <p style={{width: "650px", maxwidth:"650px", overflow:"hidden", whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{Team.team_name}</p>
+        <div className={styles.rolebadge}>{Team.owner ? "owner" : "member"}</div>
+        <div className={styles.TeamSet} onClick={(e) => {e.stopPropagation();}}>
+            {Team.owner&& 
+            <FontAwesomeIcon icon={faEllipsisVertical} onClick={(e) => {setclick_pos(-1); setmodify_mem(0); Team.owner ? setmodify(!modify) : e.preventDefault()}} 
+              style={{height:"20px", width:"20px", opacity:"0.4"}}/>
+            }
+        </div>
+        </div>
+    </div>
+    )
+})
+
+const Member = React.memo(
 function Member(props){
-    const[click, setclick] = useState(0);
-    const[click_pos, setclick_pos]=useState(0);
-    const[modify, setmodify] = useState(0);
+    const[click, setclick] = useState(0); //멤버 리스트
+    const[click_pos, setclick_pos]=useState(0); //멤버 포지션  
+    const[modify, setmodify] = useState(0); 
+    const[modify_mem, setmodify_mem] = useState(0);
+    const[delete_mem, setdelete_mem] = useState(0);
     const[addMember, setaddMember] = useState(0);
-    const[bgColor, setbgColor] = useState("");
+    const[modify_img, setmodify_img] = useState(0);
     const[member, setmember] = useState([]); // team 별 멤버 관리
     const[new_member, set_new_member] = useState([]); //새 멤버 추가
+    const[minus_member, set_minus_member] = useState([]); // 멤버 삭제
+    const [uploadImgUrl, setUploadImgUrl] = useState(""); //profile img
+    const [selectedFile, setSelectedFile] = useState(null); // 실제 img
+
     const { Team, onTeamNameChange, deleteTeamNameChange, teamName, me} = props; // ✅ 본인 team 및 전체 team_name 변경 콜백 함수.
     const my_pos = ["백엔드", "프론트", "디자이너", "모바일", "인공지능", "게임"];
 
+    const handleTeamClick = useCallback(() => {
+      setclick((c) => !c);
+      getMemberlist();
+      setclick_pos(-1);
+      setmodify_mem(0);
+    }, []);
+
     /*✅ 팀 멤버 GET */
-    const  getMemberlist=()=>{
-        const fetchUser = async () => {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-              console.warn("로그인을 먼저 하세요.");
-              return;
-            }
-            try {
-              const res = await axios.get(`/api/myteams/team/${Team.team_id}/member`, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-              setmember(res.data.members);
-              console.log(res.data);
-            } catch (err) {
-              if (err.response) {
-                console.error("서버 응답 에러:", err.response.status, err.response.data);
-              } else {
-                console.error("요청 자체 실패:", err.message);
-              }
-            }
-          };
-        
-          fetchUser();
+    const  getMemberlist= async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.warn("로그인을 먼저 하세요.");
+        return;
+      }
+      try {
+        const res = await axios.get(`/api/myteams/team/${Team.team_id}/member`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setmember(res.data.members);
+        console.log(res.data);
+      } catch (err) {
+        if (err.response) {
+          console.error("서버 응답 에러:", err.response.status, err.response.data);
+        } else {
+          console.error("요청 자체 실패:", err.message);
+        }
+      }
     }
 
-    /* ✅ 팀 이름 POST */
+    /* ✅ 팀 수정 POST */
     const modifyTeam = async (newName) => {
         const token = localStorage.getItem('accessToken');
-        const encodedTeamName = encodeURIComponent(Team.team_id);
         if (!token) {
           console.warn("로그인을 먼저 하세요.");
           return;
         }
         try {
-          const res = await axios.post(`/api/myteams/team/name/${encodedTeamName}`, 
+          const res = await axios.post(`/api/myteams/team/name/${Team.team_id}`, 
             { teamName: newName },
             {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
+
+          if (selectedFile) {
+            const form = new FormData();
+            form.append("file", selectedFile);
+            try {
+              const imgRes = await axios.post(`/api/myteams/team/image/${Team.team_id}`, form, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type" : "multipart/form-data",
+                },
+              });
+              const newImageUrl = imgRes.data.teamImage;
+              
+              setUploadImgUrl(newImageUrl);
+              setSelectedFile(null);
+
+              onTeamNameChange(Team.team_id, Team.team_name, newImageUrl);
+            } catch(err){
+              setUploadImgUrl("");
+              setSelectedFile(null);
+              if (err.response) {
+                console.error("서버 응답 에러:", err.response.status, err.response.data);
+              } else {
+                console.error("요청 자체 실패:", err.message);
+              }
+            }
+          }
           onTeamNameChange(Team.team_id, newName);
           console.log(res.data);
+          
         } catch (err) {
           if (err.response) {
             console.error("서버 응답 에러:", err.response.status, err.response.data);
@@ -68,6 +133,37 @@ function Member(props){
           }
         }
       };
+
+    /*✅ 팀 이미지 Delete */
+    const handleImageDelete = async (e) => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.warn("로그인을 먼저 하세요.");
+        return;
+      }
+
+      try {
+        const res = await axios.delete(`/api/myteams/team/del_img/${Team.team_id}`, 
+          {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        console.log(res.data);
+        setSelectedFile(null);
+        setUploadImgUrl("");
+        setmodify_img(0);
+        onTeamNameChange(Team.team_id, Team.team_name, res.data.teamImage);
+
+      } catch (err) {
+        if (err.response) {
+          console.error("서버 응답 에러:", err.response.status, err.response.data);
+        } else {
+          console.error("요청 자체 실패:", err.message);
+        }
+      }
+    }; 
 
     /* ✅ 포지션 POST */
     const modifyPos = async (newPos, member_id) => {
@@ -85,6 +181,7 @@ function Member(props){
             Authorization: `Bearer ${token}`,
           },
         });
+
         console.log(res.data);
         setclick_pos(-1);
         getMemberlist();
@@ -148,13 +245,67 @@ function Member(props){
       }
 
       if (successList.length > 0) {
-        setaddMember(false);
+        setaddMember(0);
         set_new_member([]);
         getMemberlist(); // 새로고침
       }
     };
 
+    /* ✅ 멤버 DELETE */
+    const delete_member = async (e) => {
+      e.preventDefault(); // 폼 제출 막기
 
+      const token = localStorage.getItem('accessToken');
+      const encodedTeamId = encodeURIComponent(Team.team_id);
+      if (!token) {
+        console.warn("로그인을 먼저 하세요.");
+        return;
+      }
+
+      if(minus_member.length === 0){
+        alert("삭제할 팀원을 선택하세요.");
+        return;
+      }
+
+      let successList = [];
+      let failList = [];
+
+      for (const nickname of minus_member) {
+
+        try {
+          const res = await axios.post(
+            `/api/myteams/team/${encodedTeamId}/member/delete`,
+            { member_id : nickname },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          console.log(`${nickname} 삭제됨`, res.data);
+          successList.push(nickname);
+        } catch (err) {
+          console.error(`${nickname} 삭제 실패`);
+          if (err.response) {
+            console.error("서버 응답 에러:", err.response.status, err.response.data);
+          } else {
+            console.error("요청 자체 실패:", err.message);
+          }
+          failList.push(nickname);
+        }
+      }
+
+      // 사용자에게 결과 알림
+      if (failList.length > 0) {
+       alert(`${failList.join(", ")}은(는) 존재하지 않는 사용자입니다.`);
+      }
+
+      if (successList.length > 0) {
+        set_minus_member([]);
+        setdelete_mem(0);
+        getMemberlist(); // 새로고침
+      }
+    };
 
 
     /* ✅ 팀 이미지 색상 */
@@ -173,30 +324,28 @@ function Member(props){
       return `hsl(${h}, ${s}%, ${l}%)`;
     };
   
-    /* ✅팀 이미지 update */
-    useEffect(()=>{
-        const savedbgColor = localStorage.getItem(`bgColor-${Team.team_name}`);
-        if(savedbgColor) {
-            setbgColor(savedbgColor);
-        } else{
-            const newbgColor = getbgColor();
-            localStorage.setItem(`bgColor-${Team.team_name}`, newbgColor);
-            setbgColor(newbgColor);
-        }
-    }, []);
 
-    /* ✅ 클릭 이벤트 막기 */
-    const preventClick = (e) => {
-        e.preventDefault();       
-        e.stopPropagation();
-    };
+    /* ✅ 이미지 로드 */
+    const onchangeImageUpload = (e)=> {
+        const {files} = e.target;
+        const uploadFile = files[0];
+        if (!uploadFile) return;
+        setSelectedFile(uploadFile);
+        setmodify_img(0);
+
+        const reader = new FileReader();
+        reader.readAsDataURL(uploadFile);
+        reader.onloadend = ()=> {
+          setUploadImgUrl(reader.result);};
+          console.log(uploadFile);
+      }
 
     /* ✅ 팀 이름 수정 event */
     const inputRef = useRef();
     const handleSubmit = (e, data) =>{
       e.preventDefault();
       const newTeamName = inputRef.current.value.trim();
-
+      setmodify(0);
       //입력 유무 검사
       if (!newTeamName) {
         alert("팀 이름을 입력해주세요.");
@@ -209,14 +358,6 @@ function Member(props){
         alert("이미 존재하는 팀 이름입니다. 다른 이름을 입력해주세요.");
         return;
       }
-
-      //팀 이름 변경 및 유지
-      const value = localStorage.getItem(`bgColor-${Team.team_name}`);
-      if (value !== null) {
-        localStorage.setItem(`bgColor-${newTeamName}`, value);
-        localStorage.removeItem(`bgColor-${Team.team_name}`);  
-      }
-
       // 기존 팀 이름 삭제 후 새로운 팀 이름 추가
       const updatedTeamNames = teamName.filter(name => name !== data);
       updatedTeamNames.push(newTeamName);
@@ -227,38 +368,14 @@ function Member(props){
     }
 
     //>> Component
-    /* ✅ 팀 카드  */
-    const Teamcard=()=>{
-        return (
-        <>
-        {modify ? modify_Teamname_modal() : ""}        
-        <div onClick={(e)=>{if(modify){preventClick(e);} else {setclick(!click); getMemberlist(); setclick_pos(-1); } }} className={styles.Teamcard}>
-            <div className={styles.Teamimg} style={{backgroundColor: bgColor}}></div>
-            <div className={styles.Teamdata}>
-                <p style={{width: "650px", maxwidth:"650px", overflow:"hidden", whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{Team.team_name}</p>
-            <div className={styles.rolebadge}>{Team.owner ? "owner" : "member"}</div>
-            <div className={styles.TeamSet} onClick={(e) => {e.stopPropagation();}}>
-                {Team.owner&& <i onClick={(e) => {setclick_pos(-1); Team.owner ? setmodify(!modify) : e.preventDefault()}} className="fas fa-pen fa-xl" style={{height:"20px", width:"20px", opacity:"0.4"}}/>}
-            </div>
-            </div>
-        </div>
-        </>
-        )
-    }
-
     /* ✅ 팀원 추가 모달  */
     const AddTeammember =()=>{
       const[nickname, setNickname] = useState(""); // 멤버 nickname
 
       return(
-        <div className={styles.modalOuter} onClick={()=>{setaddMember(!addMember); set_new_member([]);}}>
+        <div className={styles.modalOuter} onClick={()=>{setaddMember(!addMember); setmodify_mem(0); set_new_member([]); }}>
           <div onClick={(e) => e.stopPropagation()}>
             <form className={`${styles.modalcard} ${styles.modal}`} onSubmit={add_member}>
-
-            {/*<div style={{display:"flex", justifyContent:"center", alignItems:"center", width:"100%", paddingBottom:"25px"}}>
-              <div style={{width:"80px", height:"80px", borderRadius:"15px", backgroundColor: bgColor}}></div>
-              <p style={{fontWeight:"700", fontSize:"24px", margin:"0 30px"}}>{Team.team_name}</p>
-            </div>*/}
 
             <p style={{width:"90%", fontSize:"24px", marginBottom:"10px", fontWeight:"700"}}>팀원 모집</p>
             <div style={{display:"flex", alignItems:"center", width:"90%", marginBottom:"30px", marginLeft:"10px"}}>
@@ -285,14 +402,6 @@ function Member(props){
                   return <p key={key}> {item} </p>
                 })}
             </div>
-            {/*<div style={{width:"70%", border:"1px solid rgba(0,0,0,0.3)", overflow:"hidden", borderRadius:"6px"}}>
-              <div style={{textAlign:"center", padding:"5px", fontWeight: "500", color:"rgba(0,0,0,0.5)", borderBottom:"1px solid rgba(0,0,0,0.3)"}}>MEMBER LIST</div>
-              <ul style={{width:"100%", boxSizing:"border-box"}}>
-                {new_member.map((item, index) => (
-                <li key={index} style={{ fontSize: "14px", color: "#444" }}>{item}</li>
-              ))}
-              </ul>
-            </div>*/}
 
             <button type="submit" className={styles.modal_save} style={{width:"80%", textAlign:"center", padding:"8px 0"}}>모집완료</button>
             <div style={{fontSize:"14px", color:"rgba(0,0,0,0.4)", display:"flex", alignItems:"center", marginTop:"10px"}}>※ 팀원 추가 후 모집 완료해주세요.</div>
@@ -302,18 +411,29 @@ function Member(props){
       )
     }
 
-
     /* ✅ 멤버 리스트 */
-    const Membercomponent=({name, position, role, member_id})=>{
+    const Membercomponent= ({name, position, role, member_id})=>{
         return (
           <>
           { addMember ? <AddTeammember /> : "" }   
           <li className={styles.Memberlistset}>
               <div className={styles.Memberlistset_left}>
+                  
+                  {delete_mem && role==="member" ? 
+                  <input type="checkbox" checked={minus_member.includes(member_id)}
+                  onChange={(e)=>{
+                    if(e.target.checked){
+                      set_minus_member([...minus_member, member_id]);
+                    } else{
+                      set_minus_member(minus_member.filter((n)=>n!==member_id));
+                    }
+                  }}
+                  style={{marginLeft:"-5px", marginRight:"12px"}}></input> : ""}
+
                   <img className={styles.Memberimg} src = {profile} alt="memberprofile"></img>
                   <p className={styles.Memberimgdata}>{name}</p>
                   {me == name && position != null ? 
-                    <div onClick={()=>{if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.Memberimgdata} style={{marginLeft:"25px", textAlign:"center"}}>
+                    <div onClick={()=>{setmodify_mem(0); if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.Memberimgdata} style={{marginLeft:"25px", textAlign:"center"}}>
                       <span className={styles.button} style={{fontSize:"14px"}}>{position}</span>
                     </div> : 
                     <><p className={styles.Memberimgdata} style={{textAlign:"center", marginLeft:"25px"}}>{position}</p></>
@@ -326,7 +446,7 @@ function Member(props){
                     
                   {me == name ? <div className={click_pos == -1 ? styles.hidden : click_pos ? styles.click_pos : styles.unclick_pos} style={{display:"flex", gap:"10px", marginLeft:"10px"}}> 
                     {my_pos.map((item, key)=>
-                    (item != position)&&<div key={key} onClick={()=>{modifyPos(item, member_id); setclick_pos(!click_pos)}} className={styles.add_button} style={{fontSize:"14px"}}>{item}</div>)}
+                    (item != position)&&<div key={key} onClick={()=>{modifyPos(item, member_id); setclick_pos(!click_pos);}} className={styles.add_button} style={{fontSize:"14px"}}>{item}</div>)}
                     </div> : ""}
               </div>
               <div style={{display:"flex", alignItems:"center", justifyContent:"center", width:"70px"}}>
@@ -336,51 +456,115 @@ function Member(props){
     }
 
     /* ✅ 팀 이름 수정 모달  */
+    const fileInputRef = useRef();
     const modify_Teamname_modal=()=>{
       return(
-        <div className={styles.modalOuter} onClick={()=>{setmodify(!modify);}}>
-        <div className={`${styles.Teamcard} ${styles.modal}`} style={{position:"relative", width:"620px"}} onClick={(e) => e.stopPropagation()}>
-          <div className={styles.Teamimg} style={{backgroundColor: bgColor}}></div>
-          <form onSubmit={(e)=>handleSubmit(e, Team.team_name)}>
+        <div className={styles.modalOuter} onClick={()=>{setmodify(!modify); setmodify_img(0); setUploadImgUrl("")}}>
+        <form onSubmit={(e)=>handleSubmit(e, Team.team_name)} className={`${styles.Teamcard} ${styles.modal}`} 
+        style={{position:"relative", width:"620px"}} onClick={(e) => e.stopPropagation()}>
+
+          {/* Team 이미지 (1) 이미지 색상 오류 or hsl() 색상 (2) teamimage */}
+          {!Team.team_image.startsWith('hsl(') && !Team.team_image.startsWith('http') || Team.team_image.startsWith('hsl(')
+          ? <div className={styles.Teamimg} style={{position: "relative", display:"flex", justifyContent:"center", alignItems:"center", backgroundColor: uploadImgUrl ? "white" : Team.team_image.startsWith('hsl(') ? Team.team_image : getbgColor()}}>
+            {uploadImgUrl ? 
+            (<img src={uploadImgUrl} alt="미리보기" style={{width:"100%", height:"100%", borderRadius:"15px", objectFit:"cover", position:"absolute", top: 0, left: 0}}></img>) : null}
+            <input type="file" accept="image/*" ref={fileInputRef} onChange={onchangeImageUpload}  style={{display:"none"}}></input>
+            <FontAwesomeIcon icon={faCamera} onClick={()=>{fileInputRef.current.click();}} style={{fontSize:"28px", color:"rgba(0, 0, 0, 0.4)", cursor:"pointer", zIndex:1}}/>            
+          </div>
+          : <div className={styles.Teamimg} style={{position: "relative", display:"flex", justifyContent:"center", alignItems:"center", backgroundColor: "white"}}>
+            {uploadImgUrl ? 
+            (<img src={uploadImgUrl} alt="미리보기" style={{width:"100%", height:"100%", borderRadius:"15px", objectFit:"cover", position:"absolute", top: 0, left: 0}}></img>)
+            : Team.team_image.startsWith('http')  
+            ? (<img src={Team.team_image} alt="미리보기" style={{width:"100%", height:"100%", borderRadius:"15px", objectFit:"cover", position:"absolute", top: 0, left: 0}}></img>) 
+            : null}
+            <input type="file" accept="image/*" ref={fileInputRef} onChange={onchangeImageUpload}  style={{display:"none"}}></input>
+            <FontAwesomeIcon icon={faPen} onClick={()=>setmodify_img(!modify_img)} style={{fontSize:"28px", color:"rgba(0, 0, 0, 0.4)", cursor:"pointer", zIndex:1}}/>
+          </div>}
+            {modify_img ?
+            <div style={{position: "absolute", left:"60px", bottom: "25px", display:"flex", color:"rgba(0,0,0,0.6)", border:"1px solid rgba(0,0,0,0.2)", borderRadius: "6px", overflow:"hidden"}}> 
+              <div onClick={() => fileInputRef.current.click()} className={styles.img_btn} style={{borderRight: "1px solid rgba(0,0,0,0.2)"}} >변경</div>
+              <div onClick={handleImageDelete} className={styles.img_btn} >삭제</div>
+            </div> : ""}
             <input ref={inputRef} type="text" style={{fontWeight:"700", fontSize:"24px", marginLeft:"20px"}} defaultValue={Team.team_name}/>
             <button type="submit" className={styles.modal_submit} >SAVE</button>
           </form>
-          </div>
         </div>
       )
     }
 
     return(
-        <section>
+        <section style={{position:"relative"}}>
             {/*TEAM CARD*/}
-            <Teamcard />
-            
+            <Teamcard
+              Team={Team}
+              onClick={handleTeamClick}
+              modify={modify}
+              setmodify={setmodify}
+              getbgColor={getbgColor}
+              setclick_pos={setclick_pos}
+              modify_mem={modify_mem}
+              setmodify_mem={setmodify_mem}
+            />
+            {/*TEAM 수정 모달*/}
+            {modify ? modify_Teamname_modal() : ""}
+
+            {/*TEAM 멤버 수정 모달*/}
+            {member.length != 1 && Team.owner && modify_mem ?
+            <div style={{position: "absolute", right:"-75px", top:"170px", fontSize:"14px", border:"1px solid rgba(0,0,0,0.2)", borderRadius:"6px"}}>
+              <div onClick={()=>{setaddMember(!addMember); setmodify_mem(0);}} className={styles.modify_mem} style={{borderBottom:"1px solid rgba(0,0,0,0.2)"}}>
+                <FontAwesomeIcon icon={faPlus} style={{opacity:"0.4", marginRight:"5px"}}/>
+                팀원 추가
+              </div>
+              <div onClick={()=>{setdelete_mem(!delete_mem); setmodify_mem(0);}} className={styles.modify_mem}>
+                <FontAwesomeIcon icon={faMinus} style={{opacity:"0.4", marginRight:"5px"}}/>
+                팀원 삭제
+              </div>
+            </div> : ""}
+
+            {/*TEAM 멤버 삭제 버튼*/}
+            {delete_mem ?
+            <div style={{position: "absolute", right:"-85px", bottom: "30px"}}>
+              <button onClick={()=>{set_minus_member([]); setdelete_mem(0);}}className={styles.deletebtn} style={{marginRight:"6px"}}>취소</button>
+              <button onClick={delete_member} className={styles.deletebtn}>삭제</button>
+            </div> : ""}
+
             {/*MEMBER LIST*/}
-            <ul className={`${styles.Memberlist} ${click==0 ? styles.hidden : styles.visible}`}>
+            <ul className={`${styles.Memberlist} ${click==0 ? styles.hidden : styles.visible}`} style={{position:"relative"}}>
                 {/*MEMBER LIST - HEADER*/}  
                 <li className={styles.Memberheader}>
+                    {member.length != 1 && Team.owner &&
+                    <FontAwesomeIcon icon={faAngleRight} onClick={()=>{setmodify_mem(!modify_mem); setclick_pos(-1)}} 
+                    style={{position:"absolute", right: "15px", opacity:"0.5"}}/>}
                     <div style={{display:"flex"}}>
                         <p className={styles.Memberimgdata}>NAME</p>
                         <p className={styles.Memberimgdata} style={{marginLeft:"30px"}}>POSITION</p>
                     </div>
                         <p style={{width:"70px", marginRight:"15px", textAlign:"center"}}>ROLE</p>
+                        
                 </li>
                 {/*MEMBER LIST - DATA*/}
                 {member.map((item, key)=>
-                    <><Membercomponent key={key} name={item.name} position={item.team_role} role={item.owner?"owner":"member"} member_id={item.member_id}></Membercomponent>
-                  </>
+                  <Membercomponent key={key} name={item.name} position={item.team_role} role={item.owner?"owner":"member"} member_id={item.member_id}></Membercomponent>
                 )}
+
                 {member.length === 1?
                     <div onClick={()=>{setaddMember(!addMember); setclick_pos(-1);}} className={styles.add_team}>
                       <i class="fas fa-user-plus fa-lg" style={{opacity:"0.4", marginRight:"10px"}}></i>
                       <p style={{marginBottom:"2px"}}>팀원을 모집하세요.</p>
                     </div> : ""}
-                {member.length != 1 && Team.owner? 
-                <div onClick={()=>{setaddMember(!addMember); setclick_pos(-1);}} className={styles.add_team} style={{height:"60px"}}> <i className="fas fa-plus fa-sm" style={{opacity:"0.5", marginRight:"5px"}}></i></div>
-                : ""}
             </ul>
         </section>
     )
-}
+}, (prevProps, nextProps) => {
+    // true 반환 시 리렌더링 안 함, false 면 리렌더링 함
+    return (
+      prevProps.Team.team_id === nextProps.Team.team_id &&
+      prevProps.Team.team_name === nextProps.Team.team_name &&
+      prevProps.me === nextProps.me &&
+      prevProps.Team.team_image === nextProps.Team.team_image
+      // 비교할 props
+    ); 
+  } 
+);
+export default React.memo(Member);
 
-export default Member;
