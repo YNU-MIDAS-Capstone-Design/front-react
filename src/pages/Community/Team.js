@@ -201,7 +201,7 @@ function Team(){
     return(
         <div className={style_mypage.wrapper}>
             {/*Sidebar*/}
-            <Sidebar title="Community" dataarray={["MY TEAM", "TEAM CHAT", "TEAM BOARD"]} link={["/Team", "/", "/"]}></Sidebar>
+            <Sidebar title="Community" dataarray={["MY TEAM", "TEAM BOARD"]} link={["/Team", "/Teamboard"]}></Sidebar>
             
             <div className={style_mypage.innerbox} style={{flexDirection:"column"}}>
                 {team?.filter(item => item !== undefined && item !== null)

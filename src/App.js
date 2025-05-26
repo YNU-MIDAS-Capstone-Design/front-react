@@ -13,6 +13,8 @@ import CreatePost from "./pages/CreatePost";
 import Team from "./pages/Community/Team"
 import Project from "./pages/Project";
 import Userpage from "./pages/MyPage/UserPage";
+import Teamboard from "./pages/Community/Teamboard";
+import Whiteboard from './pages/Community/Whiteboard'; 
 
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
           <Route path="/project" element={<Project />} />
           <Route path="/team" element={<Team />} />
           <Route path="/user/:nickname" element={<Userpage />} />
+          <Route path="/whiteboard/:boardId" element={<Whiteboard />} />
+          <Route path="/teamboard" element={<Teamboard/>} />
         </Routes>
       </Template>
     </Router>
