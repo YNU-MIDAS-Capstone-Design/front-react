@@ -1,14 +1,15 @@
 import React from 'react';
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
+import { useNavigate } from 'react-router-dom';
 import styles from "../../style/Member.module.css"
 import profile from "../../assets/profile.jpg"
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleRight, faCamera, faEllipsisVertical, faMinus, faPen, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faAngleRight, faCalendar, faCamera, faEllipsisVertical, faMinus, faPen, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 //>> Component
 /* ✅ 팀 카드  */
-const Teamcard = React.memo(({ Team, onClick, modify, setmodify, getbgColor, setclick_pos, setmodify_mem, modify_mem }) => {
+const Teamcard = React.memo(({ Team, onClick, getbgColor, setclick_pos, setclick_btn, click_btn }) => {
     return (
     <div onClick={onClick} className={styles.Teamcard}>
         {Team.team_image.startsWith('hsl(') ?
@@ -21,21 +22,77 @@ const Teamcard = React.memo(({ Team, onClick, modify, setmodify, getbgColor, set
             <p style={{width: "650px", maxwidth:"650px", overflow:"hidden", whiteSpace:"nowrap",textOverflow:"ellipsis"}}>{Team.team_name}</p>
         <div className={styles.rolebadge}>{Team.owner ? "owner" : "member"}</div>
         <div className={styles.TeamSet} onClick={(e) => {e.stopPropagation();}}>
-            {Team.owner&& 
-            <FontAwesomeIcon icon={faEllipsisVertical} onClick={(e) => {setclick_pos(-1); setmodify_mem(0); Team.owner ? setmodify(!modify) : e.preventDefault()}} 
+            <FontAwesomeIcon icon={faEllipsisVertical} 
+            onMouseDown={(e) => {e.stopPropagation(); setclick_pos(-1); setclick_btn(!click_btn); console.log(`btn${click_btn}`)}} 
               style={{height:"20px", width:"20px", opacity:"0.4"}}/>
-            }
         </div>
         </div>
     </div>
     )
 })
 
+/* ✅ 멤버 리스트 */
+    const Membercomponent= ({name, position, role, member_id, member_img, addMember, AddTeammember, delete_mem, minus_member, set_minus_member, me, click_pos, setclick_pos, posbtnRef, my_pos, modifyPos})=>{
+      const navigate = useNavigate();  
+      return (
+          <>
+          { addMember ? <AddTeammember /> : "" }   
+          <li className={styles.Memberlistset} 
+              onClick={() => { //Checkbox 클릭 효과
+                if (delete_mem && role === "member") {
+                  if (minus_member.includes(member_id)) {
+                    set_minus_member(minus_member.filter((n) => n !== member_id));
+                  } else {
+                    set_minus_member([...minus_member, member_id]);
+                  }
+                }
+              }}>
+                  <div className={styles.Memberlistset_left}>
+                  
+                  {delete_mem && role==="member" ? 
+                  <input type="checkbox" checked={minus_member.includes(member_id)}
+                  onChange={(e)=>{
+
+                    if(e.target.checked){
+                      set_minus_member([...minus_member, member_id]);
+                    } else{
+                      set_minus_member(minus_member.filter((n)=>n!==member_id));
+                    }
+                  }}
+                  style={{marginLeft:"-5px", marginRight:"12px"}}></input> : ""}
+
+                  <img onClick={() => me !== name && !delete_mem ? navigate(`/user/${name}`) : ""} className={styles.Memberimg} src = {member_img===null ? profile : member_img} alt="memberprofile"></img>
+                  <p className={styles.Memberimgdata}>{name}</p>
+                  {me == name && position != null ? 
+                    <div onMouseDown={(e)=>{e.stopPropagation();if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.Memberimgdata} style={{marginLeft:"25px", textAlign:"center"}}>
+                      <span className={styles.button} style={{fontSize:"14px"}}>{position}</span>
+                    </div> : 
+                    <><p className={styles.Memberimgdata} style={{textAlign:"center", marginLeft:"25px"}}>{position}</p></>
+                    }
+
+                  {me == name && position == null ? 
+                  <div onMouseDown={(e)=>{e.stopPropagation(); if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.add_button} style={{marginLeft:"-66px"}}>
+                    <i className="fas fa-plus fa-xs" style={{opacity:"0.5"}}></i>
+                    <div style={{fontSize:"14px", marginBottom:"1px"}}> 추가</div></div>:""}
+                    
+                  {me == name ? <div ref={posbtnRef} className={click_pos == -1 ? styles.hidden : click_pos ? styles.click_pos : styles.unclick_pos} style={{display:"flex", gap:"10px", marginLeft:"10px"}}> 
+                    {my_pos.map((item, key)=>
+                    (item != position)&&<div key={key} onClick={()=>{modifyPos(item, member_id); setclick_pos(!click_pos);}} className={styles.add_button} style={{fontSize:"14px"}}>{item}</div>)}
+                    </div> : ""}
+              </div>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"center", width:"70px"}}>
+                <div className={styles.rolebadge}>{role}</div> </div>
+          </li>
+          </>)
+    }
+
 const Member = React.memo(
 function Member(props){
     const[click, setclick] = useState(0); //멤버 리스트
-    const[click_pos, setclick_pos]=useState(0); //멤버 포지션  
-    const[modify, setmodify] = useState(0); 
+    const[click_pos, setclick_pos] = useState(0); //멤버 포지션
+    const[click_btn, setclick_btn] = useState(0);
+    const[modify, setmodify] = useState(0); //팀 수정
+    const[calendar, setCalendar] = useState(0) //캘린더
     const[modify_mem, setmodify_mem] = useState(0);
     const[delete_mem, setdelete_mem] = useState(0);
     const[addMember, setaddMember] = useState(0);
@@ -45,6 +102,8 @@ function Member(props){
     const[minus_member, set_minus_member] = useState([]); // 멤버 삭제
     const [uploadImgUrl, setUploadImgUrl] = useState(""); //profile img
     const [selectedFile, setSelectedFile] = useState(null); // 실제 img
+    const btnRef = useRef(null);
+    const posbtnRef = useRef(null);
 
     const { Team, onTeamNameChange, deleteTeamNameChange, teamName, me} = props; // ✅ 본인 team 및 전체 team_name 변경 콜백 함수.
     const my_pos = ["백엔드", "프론트", "디자이너", "모바일", "인공지능", "게임"];
@@ -53,8 +112,37 @@ function Member(props){
       setclick((c) => !c);
       getMemberlist();
       setclick_pos(-1);
-      setmodify_mem(0);
     }, []);
+
+    {/* 버튼 외부 감지 */}
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (btnRef.current && !btnRef.current.contains(e.target)) {
+          setclick_btn(false);  // 바깥 클릭하면 버튼 닫기
+          if(modify_mem) setmodify_mem(false)
+        }
+      };
+
+      const handlePosClickOutside = (e) => {
+        if(posbtnRef.current && !posbtnRef.current.contains(e.target)&&click_pos==1){
+          setclick_pos(0);
+        }
+      }
+
+      if (click_btn || modify_mem) {
+        document.addEventListener("mousedown", handleClickOutside);
+      }
+
+      if(posbtnRef){
+        document.addEventListener("mousedown", handlePosClickOutside);
+      }
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("mousedown", handlePosClickOutside);
+
+      };
+    }, [click_btn, modify_mem, click_pos]);
 
     /*✅ 팀 멤버 GET */
     const  getMemberlist= async () => {
@@ -195,9 +283,9 @@ function Member(props){
     };
 
     /* ✅ 멤버 POST */
-    const add_member = async (e) => {
+    const add_member = async (e, inputdata) => {
       e.preventDefault(); // 폼 제출 막기
-
+      console.log(inputdata);
       const token = localStorage.getItem('accessToken');
       const encodedTeamId = encodeURIComponent(Team.team_id);
       if (!token) {
@@ -205,12 +293,21 @@ function Member(props){
         return;
       }
 
+      const trimmedNickname = inputdata.trim();
       const existingNicknames = member.map(m => m.name); // 현재 팀원 닉네임 리스트
+      
+       // 만약 입력창에 닉네임이 있는데 아직 new_member에 없고, 기존 팀에도 없으면 추가
+      const isAlreadyInList = new_member.includes(trimmedNickname) || existingNicknames.includes(trimmedNickname);
+      let updatedMemberList = [...new_member];
+      if (trimmedNickname && !isAlreadyInList) {
+        updatedMemberList.push(trimmedNickname);
+      }
+      
       let successList = [];
       let failList = [];
       let duplicateList = [];
 
-      for (const nickname of new_member) {
+      for (const nickname of updatedMemberList) {
         if (existingNicknames.includes(nickname)) {
           duplicateList.push(nickname);
           continue;
@@ -242,6 +339,8 @@ function Member(props){
       // 사용자에게 결과 알림
       if (failList.length > 0) {
        alert(`${failList.join(", ")}은(는) 존재하지 않는 사용자입니다.`);
+       setaddMember(0);
+       set_new_member([]);
       }
 
       if (successList.length > 0) {
@@ -372,10 +471,25 @@ function Member(props){
     const AddTeammember =()=>{
       const[nickname, setNickname] = useState(""); // 멤버 nickname
 
+      const handleAddMember = () => {
+        const trimmed = nickname.trim()
+        const isAlreadyAdded = new_member.includes(trimmed)
+        const isAlreadyInTeam = member.some((m) => m.name === trimmed)
+
+        if (!trimmed) return
+        if (isAlreadyAdded || isAlreadyInTeam) {
+          alert("이미 추가된 팀원이거나 팀에 있는 사용자입니다.")
+          return
+        }
+
+        set_new_member((prev) => [...prev, trimmed])
+        setNickname("")
+      }
+
       return(
-        <div className={styles.modalOuter} onClick={()=>{setaddMember(!addMember); setmodify_mem(0); set_new_member([]); }}>
+        <div className={styles.modalOuter} onClick={()=>{setaddMember(!addMember); set_new_member([]); }}>
           <div onClick={(e) => e.stopPropagation()}>
-            <form className={`${styles.modalcard} ${styles.modal}`} onSubmit={add_member}>
+            <form className={`${styles.modalcard} ${styles.modal}`} onSubmit={(e)=>add_member(e, nickname)}>
 
             <p style={{width:"90%", fontSize:"24px", marginBottom:"10px", fontWeight:"700"}}>팀원 모집</p>
             <div style={{display:"flex", alignItems:"center", width:"90%", marginBottom:"30px", marginLeft:"10px"}}>
@@ -385,21 +499,20 @@ function Member(props){
               </div>
             </div>
             <div style={{width:"100%", textAlign:"center", marginBottom:"5px"}}>
-              <input type="text" className={styles.modal_input} value={nickname} onChange={(e)=>setNickname(e.target.value)} ></input>
+              <input type="text" className={styles.modal_input} value={nickname} 
+                    onChange={(e)=>setNickname(e.target.value)} 
+                    onKeyDown={(e)=>{ if(e.key==="Enter"){
+                      e.preventDefault();
+                      handleAddMember();
+                    }}}></input>
               <span style={{marginLeft:"8px"}} 
-                onClick = {()=>{ 
-                  const trimmed = nickname.trim(); 
-                  const isAlreadyAdded = new_member.includes(trimmed); 
-                  const isAlreadyInTeam = member.some((m) => m.name === trimmed);
-                  if (!trimmed) return; 
-                  if (isAlreadyAdded || isAlreadyInTeam) {alert("이미 추가된 팀원이거나 팀에 있는 사용자입니다."); return;} 
-                  set_new_member((prev) => [...prev, trimmed]); setNickname("");}}> 
+                onClick = {()=>handleAddMember()}> 
                 <i className="fas fa-plus" style={{opacity:"0.4"}}></i> </span>
             </div>
-            <div style={{display:"flex", width:"75%", textAlign:"center", marginBottom:"15px", gap:"8px", color:"rgba(0,0,0,0.5)"}}>
+            <div style={{display:"flex", width:"75%", textAlign:"center", marginBottom:"15px", gap:"8px", color:"rgba(0,0,0,0.5)", flexWrap:"wrap"}}>
               {new_member.map((item, key)=>{
                   {console.log(new_member)}
-                  return <p key={key}> {item} </p>
+                  return <p key={key} style={{overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis"}}> {item} </p>
                 })}
             </div>
 
@@ -409,50 +522,6 @@ function Member(props){
           </div>
         </div>
       )
-    }
-
-    /* ✅ 멤버 리스트 */
-    const Membercomponent= ({name, position, role, member_id})=>{
-        return (
-          <>
-          { addMember ? <AddTeammember /> : "" }   
-          <li className={styles.Memberlistset}>
-              <div className={styles.Memberlistset_left}>
-                  
-                  {delete_mem && role==="member" ? 
-                  <input type="checkbox" checked={minus_member.includes(member_id)}
-                  onChange={(e)=>{
-                    if(e.target.checked){
-                      set_minus_member([...minus_member, member_id]);
-                    } else{
-                      set_minus_member(minus_member.filter((n)=>n!==member_id));
-                    }
-                  }}
-                  style={{marginLeft:"-5px", marginRight:"12px"}}></input> : ""}
-
-                  <img className={styles.Memberimg} src = {profile} alt="memberprofile"></img>
-                  <p className={styles.Memberimgdata}>{name}</p>
-                  {me == name && position != null ? 
-                    <div onClick={()=>{setmodify_mem(0); if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.Memberimgdata} style={{marginLeft:"25px", textAlign:"center"}}>
-                      <span className={styles.button} style={{fontSize:"14px"}}>{position}</span>
-                    </div> : 
-                    <><p className={styles.Memberimgdata} style={{textAlign:"center", marginLeft:"25px"}}>{position}</p></>
-                    }
-
-                  {me == name && position == null ? 
-                  <div onClick={()=>{if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.add_button} style={{marginLeft:"-66px"}}>
-                    <i className="fas fa-plus fa-xs" style={{opacity:"0.5"}}></i>
-                    <div style={{fontSize:"14px", marginBottom:"1px"}}> 추가</div></div>:""}
-                    
-                  {me == name ? <div className={click_pos == -1 ? styles.hidden : click_pos ? styles.click_pos : styles.unclick_pos} style={{display:"flex", gap:"10px", marginLeft:"10px"}}> 
-                    {my_pos.map((item, key)=>
-                    (item != position)&&<div key={key} onClick={()=>{modifyPos(item, member_id); setclick_pos(!click_pos);}} className={styles.add_button} style={{fontSize:"14px"}}>{item}</div>)}
-                    </div> : ""}
-              </div>
-              <div style={{display:"flex", alignItems:"center", justifyContent:"center", width:"70px"}}>
-                <div className={styles.rolebadge}>{role}</div> </div>
-          </li>
-          </>)
     }
 
     /* ✅ 팀 이름 수정 모달  */
@@ -498,19 +567,28 @@ function Member(props){
             <Teamcard
               Team={Team}
               onClick={handleTeamClick}
-              modify={modify}
-              setmodify={setmodify}
               getbgColor={getbgColor}
               setclick_pos={setclick_pos}
-              modify_mem={modify_mem}
-              setmodify_mem={setmodify_mem}
+              click_btn = {click_btn}
+              setclick_btn = {setclick_btn}
             />
+            {/*TEAM btn (팀 수정, 캘린더)*/}
+            {click_btn ? 
+            <div ref={btnRef} style={{position: "absolute", right: Team.owner ? "-65px" : "-20px", top:"60px", color:"rgba(0,0,0,0.6)", display:"flex", border:"1px solid rgba(0,0,0,0.2)", borderRadius: "6px", overflow:"hidden"}}>               
+              <div onClick={()=>setCalendar(!calendar)}  className={styles.team_btn} style={{borderRight:"1px solid rgba(0,0,0,0.2)"}} >
+                <FontAwesomeIcon icon={faCalendar} style={{opacity:"0.5"}}/>
+              </div> 
+              {Team.owner ? <div onClick={()=>setmodify(!modify)} className={styles.team_btn} >
+                <FontAwesomeIcon icon={faPen} style={{opacity:"0.6"}}/>
+              </div> :""}
+            </div>: ""}
+
             {/*TEAM 수정 모달*/}
             {modify ? modify_Teamname_modal() : ""}
 
             {/*TEAM 멤버 수정 모달*/}
             {member.length != 1 && Team.owner && modify_mem ?
-            <div style={{position: "absolute", right:"-75px", top:"170px", fontSize:"14px", border:"1px solid rgba(0,0,0,0.2)", borderRadius:"6px"}}>
+            <div ref={btnRef} style={{position: "absolute", right:"-75px", top:"170px", fontSize:"14px", border:"1px solid rgba(0,0,0,0.2)", borderRadius:"6px"}}>
               <div onClick={()=>{setaddMember(!addMember); setmodify_mem(0);}} className={styles.modify_mem} style={{borderBottom:"1px solid rgba(0,0,0,0.2)"}}>
                 <FontAwesomeIcon icon={faPlus} style={{opacity:"0.4", marginRight:"5px"}}/>
                 팀원 추가
@@ -533,7 +611,8 @@ function Member(props){
                 {/*MEMBER LIST - HEADER*/}  
                 <li className={styles.Memberheader}>
                     {member.length != 1 && Team.owner &&
-                    <FontAwesomeIcon icon={faAngleRight} onClick={()=>{setmodify_mem(!modify_mem); setclick_pos(-1)}} 
+                    <FontAwesomeIcon icon={faAngleRight} 
+                    onMouseDown={(e)=>{e.stopPropagation(); setmodify_mem(!modify_mem); setclick_pos(-1); setclick_btn(0)}} 
                     style={{position:"absolute", right: "15px", opacity:"0.5"}}/>}
                     <div style={{display:"flex"}}>
                         <p className={styles.Memberimgdata}>NAME</p>
@@ -544,7 +623,11 @@ function Member(props){
                 </li>
                 {/*MEMBER LIST - DATA*/}
                 {member.map((item, key)=>
-                  <Membercomponent key={key} name={item.name} position={item.team_role} role={item.owner?"owner":"member"} member_id={item.member_id}></Membercomponent>
+                  <Membercomponent 
+                  key={key} name={item.name} position={item.team_role} role={item.owner?"owner":"member"} member_id={item.member_id} member_img={item.image_url}
+                  addMember={addMember} AddTeammember={AddTeammember} delete_mem={delete_mem} minus_member={minus_member} set_minus_member={set_minus_member}
+                  me={me} click_pos={click_pos} setclick_pos={setclick_pos} posbtnRef={posbtnRef} my_pos={my_pos} modifyPos={modifyPos}>
+                  </Membercomponent>
                 )}
 
                 {member.length === 1?

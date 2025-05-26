@@ -12,6 +12,7 @@ import Post from "./pages/Post";
 import CreatePost from "./pages/CreatePost";
 import Team from "./pages/Community/Team"
 import Project from "./pages/Project";
+import Userpage from "./pages/MyPage/UserPage";
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/CreatePost/edit/:projectId" element={<CreatePost />} />
           <Route path="/project" element={<Project />} />
           <Route path="/team" element={<Team />} />
+          <Route path="/user/:nickname" element={<Userpage />} />
         </Routes>
       </Template>
     </Router>

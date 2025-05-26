@@ -90,7 +90,11 @@ function Likedpage(){
                         borderRadius:"10px", padding: "20px 30px", gap:"5px"}}>
                             <p style={{fontSize:"20px", fontWeight:"500"}}>{title}</p>
                             <div className={styles.ellipsis_2_lines} style={{color:"rgba(0,0,0,0.7)"}}>
-                                {content} </div>      
+                                {content} </div>
+                            <div style={{display:"flex", gap:"10px", fontSize:"15px", color:"rgba(0,0,0,0.5)"}}>
+                              {stacklist?.map((item, index)=>
+                              <div>#{item}</div>
+                            )}</div>   
             </div>    
         )
     }
@@ -112,7 +116,7 @@ function Likedpage(){
                     </div>
                     <div className={styles.body}> 
                         {project?.map((item, key)=>(
-                            <ProjectCard key={key} title={item.title} content={item.content} stacklist={item.stacklist}/>
+                            <ProjectCard key={key} title={item.title} content={item.content} stacklist={item.stackList}/>
                         ))}
                     </div>
             </div>

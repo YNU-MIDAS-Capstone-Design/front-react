@@ -6,6 +6,7 @@ import git from "../../assets/github-brands.svg"
 import axios from 'axios'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import {job, stack, locate} from '../enum.js'
 
 function Mypage(){
     /* ───────────────────────────────────────────── state ───────────────────────────────────────────── */
@@ -23,58 +24,10 @@ function Mypage(){
     const [selectedmbti, setSelectedmbti] = useState(user.mbti);
 
     /* ───────────────────────────────────────────── enum & const ───────────────────────────────────────────── */
-    const job=['학생', '전공자', '비전공자', '회사원', '프리랜서', '기타'];
-    const stack =[
-
-      //백엔드
-      "Nodejs",
-      "Java",
-      "Spring",
-      "Express",
-      "Django",
-      "Flask",
-      "NestJS",
-      "MySQL",
-      "MongoDB",
-      "Docker",
-      "AWS",
-      
-      //프론트
-      "JavaScript",
-      "HTML",
-      "CSS",
-      "React",
-      "Vue",
-      
-      //디자이너
-      "Figma",
-      "Illustrator",
-      "Adobe_XD",
-      
-      //모바일 앱
-      "Android",
-      "Kotlin",
-      "Swift",
-      "Flutter",
-      
-      //인공지능
-      "Python",
-      "AI",
-      "BigData",
-      
-      //게임+기타
-      "Unity",
-      "UnrealEngine",
-      "C_SHARP",  //C#
-      "C_PLUS",   //C++
-      "IoT",
-      "security"
-    ];
-    const locate=['경기도', '강원도', '충청북도', '충청남도', '전라북도', '전라남도', '경상북도', '경상남도'];
     const images = require.context('../../assets/stack', false, /\.png$/);
 
 
-    /*✅ 사용자 로그인 정보 GET */
+    /*✅ 사용자 정보 GET */
     useEffect(() => {
         const fetchUser = async () => {
           const token = localStorage.getItem('accessToken');
@@ -106,13 +59,12 @@ function Mypage(){
         fetchUser();
       }, [edit]);
 
-    /*✅ Mypage 정보 GET */
+    /*✅ 사용자 정보 Patch, 이미지 PUT */
     const modifyUser = async (e) => {
         e.preventDefault();
-        console.log(typeof(user.techStacks));
-        const stack = Array.isArray(user.techStacks)
+        const stack = Array.isArray(user?.techStacks)
         ? user.techStacks.map(item => item.trim()).filter(Boolean)
-        : typeof user.techStacks === 'string'
+        : typeof user?.techStacks === 'string'
           ? user.techStacks.split(',').map(item => item.trim()).filter(Boolean)
           : [];
         const token = localStorage.getItem('accessToken');
@@ -121,7 +73,6 @@ function Mypage(){
           return;
         }
         const updatedUser = { ...user, location: selectedLocation, techStacks: stack, job: selectedJob, mbti: selectedmbti};
-        console.log(updatedUser);
         try {
           const res = await axios.patch('/api/users/me', updatedUser,
             {
@@ -140,7 +91,6 @@ function Mypage(){
                   "Content-Type" : "multipart/form-data",
                 },
               });
-              console.log(imgRes.data.data)
               setUploadImgUrl(imgRes.data.data.imageUrl);
               setSelectedFile(null);
             } catch(err){
@@ -226,16 +176,6 @@ function Mypage(){
 
       return `hsl(${h}, ${s}%, ${l}%)`;
     };
-
-    /* ✅ 팀 이미지 로드 */
-    const handlebgColor=(Team_name)=>{
-        const savedbgColor = localStorage.getItem(`bgColor-${Team_name}`);
-        if(!savedbgColor) {
-            const newbgColor = getbgColor();
-            localStorage.setItem(`bgColor-${Team_name}`, newbgColor);
-        }
-        return localStorage.getItem(`bgColor-${Team_name}`);
-    }
 
     /* ✅ GitUrl */
     const GitUser=(gitUrl)=>{
@@ -365,7 +305,7 @@ function Mypage(){
                                   {user.mbti}</div> : 
                                   <div style={{display:"flex", flexDirection:"column", width:"100%", gap:"6px"}}>
                                     <div style={{display:"flex", width:"100%", gap:"5px", justifyContent: "center", alignContent: "center"}}>
-                                      {Array.from(selectedmbti).map((char, index)=>{
+                                      {selectedmbti && Array.from(selectedmbti).map((char, index)=>{
                                       return (
                                         <div key={index} className={styles.mbti_btn} onClick={()=>setmbti_click(1)}>{char}</div>
                                       )
@@ -390,7 +330,7 @@ function Mypage(){
                                   <div style={{marginBottom:"-20px"}}>
                                     <div onClick={()=>{setjob_click(!job_click);}} className={`${styles.loc_drop} ${styles.Dropdown} `} style={job_click ? {color: "rgba(0,0,0,0.6)", border: "2px solid rgb(73, 119, 236)", cursor: "pointer"} : {color: "rgba(0,0,0,0.6)", cursor: "pointer"}}>
                                         <div ></div>
-                                        {selectedJob == null ? `직업` : `${selectedJob}`}
+                                        {selectedJob === null ? `직업` : `${selectedJob}`}
                                         <i className={job_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} style={{...(job_click ? {color:"rgb(73, 119, 236)"} : {})}}></i>
                                     </div>
                                     <ul className={`${styles.loc_ul} ${!job_click ? styles.hidden : `${styles.Dropdown} ${styles.visible}`}`}>
@@ -409,7 +349,7 @@ function Mypage(){
                                 : <div style={{marginBottom:"-20px"}}>
                                     <div onClick={()=>{setloc_click(!loc_click);}} className={`${styles.loc_drop} ${styles.Dropdown} `} style={loc_click ? {color: "rgba(0,0,0,0.6)", border: "2px solid rgb(73, 119, 236)", cursor: "pointer"} : {color: "rgba(0,0,0,0.6)", cursor: "pointer"}}>
                                         <div ></div>
-                                        {selectedLocation == null ? `시/도` : `${selectedLocation}`}
+                                        {selectedLocation === null ? `시/도` : `${selectedLocation}`}
                                         <i className={loc_click ? "fas fa-caret-down xl" : "fas fa-caret-up xl"} style={{...(loc_click ? {color:"rgb(73, 119, 236)"} : {})}}></i>
                                     </div>
                                     <ul className={`${styles.loc_ul} ${!loc_click ? styles.hidden : `${styles.Dropdown} ${styles.visible}`}`}>
