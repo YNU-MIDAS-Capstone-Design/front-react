@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../../components/template/Sidebar"
-import Whiteboard from "./Whiteboard";
 import style_mypage from "../../style/Mypage.module.css"
 
 function Teamboard(){
     const[team, setteam] = useState([]); // 팀 전체 정보
     const [selectedTeamId, setSelectedTeamId] = useState(null);
     const[me, setme] = useState();
+    const navigate = useNavigate();
+
+    const handleTeamClick = (team_id) => {
+      const boardId = team_id ? `team${team_id}` : `board${me?.nickname}`;
+      navigate(`/whiteboard/${boardId}`, { state: { me } });
+    }
+
     
     /*✅ 유저 정보 GET */
     const fetchUser = async () => {
@@ -88,8 +95,6 @@ function Teamboard(){
       cursor: "pointer",
       transition: "opacity 0.2s ease",
     };
-    const getOpacity = (id) => selectedTeamId === id ? 1 : 0.4;
-
     
 
     return(
@@ -103,21 +108,21 @@ function Teamboard(){
                             return (
                                 <div key={index} style={{ width: "50px", height: "50px", position: "relative" }}>
                                 {!item.team_image.startsWith('http') && !item.team_image.startsWith('hsl(') ? 
-                                    <div onClick={() => setSelectedTeamId(item.team_id)}
-                                    style={{...baseBoxStyle, backgroundColor: getbgColor(), opacity: getOpacity(item.team_id)}}/>
+                                    <div onClick={() => handleTeamClick(item.team_id)}
+                                    style={{...baseBoxStyle, backgroundColor: getbgColor()}}/>
                                     : item.team_image.startsWith('hsl(')
-                                        ? <div onClick={() => setSelectedTeamId(item.team_id)}
-                                        style={{ ...baseBoxStyle, backgroundColor: item.team_image, opacity: getOpacity(item.team_id)}}/> 
-                                        : (<img src={item.team_image} alt="미리보기" onClick={() => setSelectedTeamId(item.team_id)}
+                                        ? <div onClick={() => handleTeamClick(item.team_id)}
+                                        style={{ ...baseBoxStyle, backgroundColor: item.team_image}}/> 
+                                        : (<img src={item.team_image} alt="미리보기" onClick={() => handleTeamClick(item.team_id)}
                                         style={{ ...baseBoxStyle, width: "100%", height: "100%", position: "absolute", top: 0, left: 0, 
-                                          objectFit: "cover", opacity: getOpacity(item.team_id)}}/>
+                                          objectFit: "cover"}}/>
                                 )} </div>
                             );
                         })}
 
                     </div>
 
-                    {me&&<Whiteboard key={selectedTeamId} teamId={selectedTeamId} me={me} />}
+                    {/*me&&<Whiteboard key={selectedTeamId} teamId={selectedTeamId} me={me} />*/}
                 </div>
             </div>
         )

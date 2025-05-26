@@ -3,17 +3,26 @@
   justify-content: space-between !important;
 }
 
-.tlui-layout__top__left{
-    width: 80% !important;
+.tlui-menu-zone {
+    width: 345.6px !important;
 }
 
-.tlui-layout__top__right{
-    width: 20% !important;
+.tlui-toolbar-container.tlui-buttons__horizontal{
+    width: 184px !important;
 }
 
-.tlui-style-panel__wrapper:only-child{
-    top: 50px !important;
+.tlui-button.tlui-button__icon, .tlui-button.tlui-button__icon.tlui-navigation-panel__toggle{
+    width: 40px !important;
 }
+
+.tlui-popover{
+    width: 128px !important;
+}
+
+.tlui-navigation-panel{
+    width: 96px !important;
+}
+
 
 .Memberimg{
     width: 50px;
