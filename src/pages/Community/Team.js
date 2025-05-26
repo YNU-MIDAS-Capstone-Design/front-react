@@ -204,7 +204,6 @@ function Team(){
             <Sidebar title="Community" dataarray={["MY TEAM", "TEAM CHAT", "TEAM BOARD"]} link={["/Team", "/", "/"]}></Sidebar>
             
             <div className={style_mypage.innerbox} style={{flexDirection:"column"}}>
-                {team.filter(item => item !== undefined && item !== null)
                 {team?.filter(item => item !== undefined && item !== null)
                   .map((item, key) => (
                     <Member key={key} Team={item} onTeamNameChange={updateTeamName} deleteTeamNameChange={deleteTeamName} teamName = {teamName} me={me}/>
