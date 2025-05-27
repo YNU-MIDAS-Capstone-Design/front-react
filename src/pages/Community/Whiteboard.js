@@ -118,11 +118,27 @@ function Whiteboard() {
         const intervalMs = 100; // 재시도 간격
 
         const tryLoadSnapshot = (tries = 0) => {
+            const maxReloads = 3;
+            const reloadKey = `reloadCount-${boardId}`; // boardId마다 개별 카운팅
+
+            const handleMaxRetry = () => {
+                const currentCount = parseInt(sessionStorage.getItem(reloadKey) || '0', 10);
+                if (currentCount < maxReloads) {
+                    sessionStorage.setItem(reloadKey, (currentCount + 1).toString());
+                    console.warn(`[재시도 ${currentCount + 1}회] 새로고침 시도`);
+                    window.location.reload();
+                } else {
+                    alert("로딩에 반복 실패했습니다. 나중에 다시 시도해 주세요.");
+                    sessionStorage.removeItem(reloadKey); // 실패 후 리셋
+                }
+            };
+
             if (!yorkieDoc.current) {
                 if (tries < maxTries) {
                     setTimeout(() => tryLoadSnapshot(tries + 1), intervalMs);
                 } else {
                     console.warn('[스냅샷 없음] 최대 시도 초과');
+                    handleMaxRetry();
                 }
                 return;
             }
@@ -134,17 +150,21 @@ function Whiteboard() {
                     loadSnapshot(editor.store, parsed);
                     console.log('[초기 스냅샷 불러옴]', parsed);
                     setSnapshotLoaded(true);
+                    sessionStorage.removeItem(reloadKey); // 성공 시 리셋
                 } else {
                     if (tries < maxTries) {
                         setTimeout(() => tryLoadSnapshot(tries + 1), intervalMs);
                     } else {
                         console.warn('[스냅샷 없음] 최대 시도 초과');
+                        handleMaxRetry();
                     }
                 }
             } catch (err) {
                 console.error('[초기 스냅샷 파싱 오류]', err);
+                handleMaxRetry();
             }
         };
+
 
         tryLoadSnapshot();
 
@@ -184,7 +204,7 @@ function Whiteboard() {
                 <div
                     style={{
                         position: "absolute",
-                        top: 0,
+                        top: 80,
                         left: 0,
                         width: "100%",
                         height: "650px",
@@ -195,7 +215,11 @@ function Whiteboard() {
                         fontSize: "18px",
                     }}
                 >
-                    화이트보드를 불러오는 중입니다...
+                    <section className="loading_round">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </section>
                 </div>
             )}
 

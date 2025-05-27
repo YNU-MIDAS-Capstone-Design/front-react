@@ -23,6 +23,34 @@
     width: 96px !important;
 }
 
+@keyframes rotate {
+        0% {
+          transform: rotateZ(0deg);
+        }
+        100% {
+          transform: rotateZ(180deg);
+        }
+      }
+.loading_round {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 120px;
+        display: flex;
+      }
+
+.loading_round {
+    justify-content: space-between;
+    animation: rotate 1s ease-in-out infinite;
+}
+
+.loading_round div{
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    background-color: rgb(73, 119, 236);
+}
 
 .Memberimg{
     width: 50px;
