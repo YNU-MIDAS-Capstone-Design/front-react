@@ -175,8 +175,8 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
           </h2>
           {renderModalContent()}
           <div style={{ marginTop: "16px", display: "flex", gap: "8px" }}>
-            <button onClick={handleConfirm}>확인</button>
-            <button onClick={closeModal}>취소</button>
+            <button className={styles.modalBtnAccept} onClick={handleConfirm}>확인</button>
+            <button className={styles.modalBtnCancel}onClick={closeModal}>취소</button>
           </div>
         </Box>
       </Modal>

@@ -88,9 +88,7 @@ const Post = () =>{
             fetchComments();
         })
         .catch((err)=>{
-                console.error("🔥 댓글 등록 실패:", err);
-                console.log("🔁 상태 코드:", err.response?.status);
-                console.log("📩 응답 데이터:", err.response?.data);
+                alert("글 등록 실패하였습니다.");
         })
     }
     const editComment = (commentId, currentMessage) => {

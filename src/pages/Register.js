@@ -14,12 +14,12 @@ const Register = () => {
     nickname: "",
     email: "",
     password: "",
-    bio: null,
-    location: null,
-    sns: null,
+    bio: "",
+    location: "",
+    sns: "",
+    mbti: "",
+    job: "",
     techStacks: [
-      "CSS",
-      "HTML"
     ]
   });
 

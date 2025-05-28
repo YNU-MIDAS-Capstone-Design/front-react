@@ -7,6 +7,7 @@ import banner1 from "../assets/banner11.png";
 import banner2 from "../assets/banner22.png";
 import StackFilter from "../components/template/StackFilter";
 import SearchBar from "../components/template/Homesearch";
+import AlarmButton from "../components/alarmButton/AlarmButton";
 
 const banners = [banner1, banner2];
 
@@ -165,6 +166,12 @@ const Home = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedStacks, setSelectedStacks] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [notiCount, setNotiCount] = useState({count: 0});
+
+  const [isAlarmOpen, setIsAlarmOpen] = useState(false);
+  const toggleAlarm = () => {
+    setIsAlarmOpen(prev => !prev);
+  };
 
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
@@ -200,6 +207,7 @@ const Home = () => {
           setErrorMessage("");
         }
       });
+      alarmCount();
   }, []);
 
   useEffect(() => {
@@ -238,6 +246,21 @@ const Home = () => {
     setSlideState((prev) => ({ ...prev, [key]: (prev[key] - 1 + max) % max }));
   };
 
+  const alarmCount =()=>{
+    axios.get(`/api/notifications/unread-count`,{
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then((res)=>{
+      console.log(res.data.count);
+      setNotiCount(res.data.count);
+    })
+    .catch(()=>{
+      alert("오류가 발생했습니다.");
+    })
+  }
+
   const renderSection = (title, key) => {
     const max = Math.ceil(data[key].length / 3);
     const jobsToShow = data[key].slice(
@@ -248,6 +271,8 @@ const Home = () => {
     const handleProjectClick = (projectId) => {
       navigate(`/Post/${Number(projectId)}`);
     };
+
+
 
     return (
       <section className={styles.popularJobListings}>
@@ -413,7 +438,14 @@ const Home = () => {
       </button>
       </Link>
 
-      <button className={styles.alarmButton}></button>
+      {/* 알람 버튼 */}
+      <div className={styles.alarmWrapper}>
+        <button className={styles.alarmButton} onClick={toggleAlarm}></button>
+        {notiCount > 0 && (
+          <div className={styles.badge}>{notiCount}</div>
+        )}
+      </div>
+      <AlarmButton isOpen={isAlarmOpen} onClose={() => setIsAlarmOpen(false)} />
 
       {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
 

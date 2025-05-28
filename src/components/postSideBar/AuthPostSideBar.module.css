@@ -66,3 +66,13 @@
 .starButton.active {
   color: gold;
 }
+
+.modalBtnAccept{
+  justify-content: center;
+  border: none;
+  background-color: #b6d5ff;
+}
+.modalBtnCancel{
+  justify-content: center;
+  border: none;
+}

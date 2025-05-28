@@ -1,7 +1,6 @@
 .notificationSection {
   width: 100%;
-  border-right: 1px solid #ddd;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   bottom: 90px !important;
   right: 25px !important;
 }
@@ -17,4 +16,36 @@
   white-space: normal;
   overflow-y: hidden;
   overflow-x: hidden;
+}
+.notification{
+  height: 66px;
+  display: block;
+  align-content: center;
+}
+.read{
+  color: #888;
+  background-color: #f9f9f9;
+}
+.unread{
+  background-color: #eaf3ff;
+}
+.row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.type{
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  justify-content: left;
+}
+.date{
+  font-size: 11px;
+  line-height: 16px;
+  justify-content: right;
+}
+.message{
+  font-size: 14px;
+  line-height: 20px;
 }
