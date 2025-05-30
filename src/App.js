@@ -35,7 +35,7 @@ function App() {
           <Route path="/project" element={<Project />} />
           <Route path="/team" element={<Team />} />
           <Route path="/user/:nickname" element={<Userpage />} />
-          <Route path="/whiteboard/:boardId" element={<Whiteboard />} />
+          <Route path="/whiteboard/:teamId" element={<Whiteboard />} />
           <Route path="/teamboard" element={<Teamboard/>} />
         </Routes>
       </Template>

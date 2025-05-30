@@ -1,0 +1,32 @@
+.outerBoxStyle {
+    width: 210px;
+    height: 160px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+.baseBoxStyle {
+    width: 210px;
+    height: 100px;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(0,0,0,0.15);
+}
+
+.imgStyle{
+    width: 210px;
+    height: 180px;
+}
+
+.outerBoxStyle:hover{
+    box-shadow: 0 1px 4px 0 #0000001a,0 1px 4px -3px #0000001a;
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+.baseBoxStyle:hover{
+    border-bottom: 1px solid rgba(0,0,0,0.18);
+}

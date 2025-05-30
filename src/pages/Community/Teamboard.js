@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Sidebar from "../../components/template/Sidebar"
 import style_mypage from "../../style/Mypage.module.css"
+import styles from "../../style/Teamboard.module.css"
+
 
 function Teamboard(){
     const[team, setteam] = useState([]); // 팀 전체 정보
-    const [selectedTeamId, setSelectedTeamId] = useState(null);
     const[me, setme] = useState();
     const navigate = useNavigate();
 
     const handleTeamClick = (team_id) => {
-      const boardId = team_id ? `team${team_id}` : `board${me?.nickname}`;
-      navigate(`/whiteboard/${boardId}`, { state: { me } });
+      navigate(`/whiteboard/${team_id}`, { state: { me } });
     }
 
     
@@ -84,45 +84,31 @@ function Teamboard(){
       return `hsl(${h}, ${s}%, ${l}%)`;
     };
 
-     // css style
-    const baseBoxStyle = {
-      width: "50px",
-      height: "50px",
-      borderRadius: "15px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      cursor: "pointer",
-      transition: "opacity 0.2s ease",
-    };
-    
-
     return(
             <div className={style_mypage.wrapper}>
                 {/*Sidebar*/}
                 <Sidebar title="Community" dataarray={["MY TEAM", "TEAM BOARD"]} link={["/Team", "/Teamboard"]}></Sidebar>
-                <div className={style_mypage.innerbox} style={{flexDirection:"column", marginTop:"15px"}}>
-                    <div style={{width:"100%", height:"50px", display:"flex", alignItems:"center", gap:"15px", marginBottom:"10px", marginLeft:"10px"}}>
-                        <p style={{fontSize:"24px", fontWeight:"700", marginRight:"20px"}}>TEAM BOARD</p>
-                        {team?.map((item, index) => {
+                <div className={style_mypage.innerbox} style={{flexDirection:"column", marginTop:"18px"}}>
+                  <div style={{width:"1000px", height:"50px", display:"flex", alignItems:"center", marginBottom:"10px", marginLeft:"10px"}}>
+                      <p style={{fontSize:"24px", fontWeight:"700", marginRight:"20px"}}>TEAM BOARD</p>
+                  </div>
+                  <div style={{width:"1000px", display:"flex", alignItems:"center", gap:"50px", margin: "20px", flexWrap:"wrap"}}>
+                    {team?.map((item, index) => {
                             return (
-                                <div key={index} style={{ width: "50px", height: "50px", position: "relative" }}>
-                                {!item.team_image.startsWith('http') && !item.team_image.startsWith('hsl(') ? 
-                                    <div onClick={() => handleTeamClick(item.team_id)}
-                                    style={{...baseBoxStyle, backgroundColor: getbgColor()}}/>
-                                    : item.team_image.startsWith('hsl(')
-                                        ? <div onClick={() => handleTeamClick(item.team_id)}
-                                        style={{ ...baseBoxStyle, backgroundColor: item.team_image}}/> 
-                                        : (<img src={item.team_image} alt="미리보기" onClick={() => handleTeamClick(item.team_id)}
-                                        style={{ ...baseBoxStyle, width: "100%", height: "100%", position: "absolute", top: 0, left: 0, 
-                                          objectFit: "cover"}}/>
-                                )} </div>
+                                <div key={index} onClick={() => handleTeamClick(item.team_id)} className={styles.outerBoxStyle}>
+                                  <div className={styles.baseBoxStyle}>
+                                    {!item.team_image.startsWith('http') && !item.team_image.startsWith('hsl(') ? 
+                                      <div className={styles.imgStyle} style={{backgroundColor: getbgColor()}}/>
+                                      : item.team_image.startsWith('hsl(')
+                                          ? <div className={styles.imgStyle} style={{backgroundColor: item.team_image}}/>
+                                          : (<img src={item.team_image} alt="미리보기" className={styles.imgStyle}/>
+                                    )} 
+                                  </div>
+                                  <div style={{height:"58px", display:"flex", alignItems: "center", fontSize:"16px", fontWeight:"500", padding:"0 12px", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", }}> {item.team_name} </div>                         
+                                </div>
                             );
                         })}
-
-                    </div>
-
-                    {/*me&&<Whiteboard key={selectedTeamId} teamId={selectedTeamId} me={me} />*/}
+                   </div>
                 </div>
             </div>
         )

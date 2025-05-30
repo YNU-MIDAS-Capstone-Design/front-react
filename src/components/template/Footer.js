@@ -8,6 +8,7 @@ const Footer = () =>{
     return(
         <>
         <div className={styles.divider}/>
+        <div style={{width:"100%", backgroundColor:"rgba(0,0,0,0.02)"}}>
         <div className={styles.wrapper}>
             <div className={styles.copyRight}>
                 <CopyrightIcon/>
@@ -18,6 +19,7 @@ const Footer = () =>{
                 <TwitterIcon/>
                 <InstagramIcon/>
             </div>
+        </div>
         </div>
         </>
     )

@@ -34,6 +34,16 @@ export function updateSnapshot(doc, snapObj) {
     /* 별도 doc.sync() 호출 필요 없음(자동 loop) */
 }
 
+/*───────── presence 변경 감지 구독 ─────────*/
+export function subscribeToPresence(doc, onPresenceChange) {
+  doc.subscribe(event => {
+    if (event.type === 'presence-changed') {
+      const { clientID, presence } = event;
+      onPresenceChange(clientID, presence);
+    }
+  });
+}
+
 /*───────── 접속자 목록 확인하기 ─────────*/
 export function getActiveUsers(doc) {
   const presences = doc.getPresences(); // Map(clientID → presence 객체)
@@ -47,14 +57,4 @@ export function getActiveUsers(doc) {
   });
 
   return users;
-}
-
-/*───────── presence 변경 감지 구독 ─────────*/
-export function subscribeToPresence(doc, onPresenceChange) {
-  doc.subscribe(event => {
-    if (event.type === 'presence-changed') {
-      const { clientID, presence } = event;
-      onPresenceChange(clientID, presence);
-    }
-  });
 }

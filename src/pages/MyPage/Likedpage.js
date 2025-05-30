@@ -104,9 +104,9 @@ function Likedpage(){
             {/*Sidebar*/}
             <Sidebar title="MY PAGE" dataarray={["MY PROFILE",  "내 활동"]} link={["/Mypage", "/Likedpage"]}></Sidebar>
             
-            <div className={styles.innerbox}>
+            <div className={styles.innerbox} >
                     <div className={styles.header}>
-                        <p style={{fontSize:"24px", fontWeight:"500", marginBottom:"25px"}}>내 활동</p>
+                        <p style={{fontSize:"24px", fontWeight:"700", marginBottom:"25px"}}>내 활동</p>
                         <div style={{display:"flex", justifyContent:"left", alignItem:"center"}}>
                                 <p onClick={() => {setClick(1); fetchPost();}} className={click===1 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>작성한 글</p>
                                 <p onClick={() => {setClick(2); fetchlikes();}} className={click===2 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>지원한 글</p>
