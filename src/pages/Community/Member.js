@@ -6,6 +6,7 @@ import profile from "../../assets/profile.jpg"
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleRight, faCalendar, faCamera, faEllipsisVertical, faMinus, faPen, faPlus } from "@fortawesome/free-solid-svg-icons";
+import CustomCalendar from "../../components/Calendar/CustomCalendar"
 
 //>> Component
 /* ✅ 팀 카드  */
@@ -109,10 +110,12 @@ function Member(props){
     const my_pos = ["백엔드", "프론트", "디자이너", "모바일", "인공지능", "게임"];
 
     const handleTeamClick = useCallback(() => {
-      setclick((c) => !c);
-      getMemberlist();
-      setclick_pos(-1);
-    }, []);
+  setclick((c) => !c);
+  setCalendar(false);  // ✅ 캘린더 닫기
+  getMemberlist();
+  setclick_pos(-1);
+}, []);
+
 
     {/* 버튼 외부 감지 */}
     useEffect(() => {
@@ -561,83 +564,225 @@ function Member(props){
       )
     }
 
-    return(
-        <section style={{position:"relative"}}>
-            {/*TEAM CARD*/}
-            <Teamcard
-              Team={Team}
-              onClick={handleTeamClick}
-              getbgColor={getbgColor}
-              setclick_pos={setclick_pos}
-              click_btn = {click_btn}
-              setclick_btn = {setclick_btn}
+    return (
+  <section style={{ position: "relative" }}>
+    {/* TEAM CARD */}
+    <Teamcard
+      Team={Team}
+      onClick={handleTeamClick}
+      getbgColor={getbgColor}
+      setclick_pos={setclick_pos}
+      click_btn={click_btn}
+      setclick_btn={setclick_btn}
+    />
+
+    {/* TEAM btn (팀 수정, 캘린더) */}
+    {click_btn ? (
+      <div
+        ref={btnRef}
+        style={{
+          position: "absolute",
+          right: Team.owner ? "-65px" : "-20px",
+          top: "60px",
+          color: "rgba(0,0,0,0.6)",
+          display: "flex",
+          border: "1px solid rgba(0,0,0,0.2)",
+          borderRadius: "6px",
+          overflow: "hidden",
+        }}
+      >
+        {/* 캘린더 버튼 */}
+        <div
+          onClick={() => {
+            setCalendar((prev) => !prev);
+            setclick(false);
+            setmodify(false);
+          }}
+          className={styles.team_btn}
+          style={{ borderRight: "1px solid rgba(0,0,0,0.2)" }}
+        >
+          <FontAwesomeIcon icon={faCalendar} style={{ opacity: "0.5" }} />
+        </div>
+
+        {/* 수정 버튼 */}
+        {Team.owner ? (
+          <div
+            onClick={() => {
+              setmodify((prev) => !prev);
+              setclick(false);
+              setCalendar(false);
+            }}
+            className={styles.team_btn}
+          >
+            <FontAwesomeIcon icon={faPen} style={{ opacity: "0.6" }} />
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
+    ) : (
+      ""
+    )}
+
+    {/* TEAM 수정 모달 */}
+    {modify ? modify_Teamname_modal() : ""}
+
+    {/* 캘린더 렌더링 */}
+    {calendar ? <CustomCalendar teamId={Team.team_id} /> : ""}
+
+    {/* TEAM 멤버 수정 모달 */}
+    {member.length != 1 && Team.owner && modify_mem ? (
+      <div
+        ref={btnRef}
+        style={{
+          position: "absolute",
+          right: "-75px",
+          top: "170px",
+          fontSize: "14px",
+          border: "1px solid rgba(0,0,0,0.2)",
+          borderRadius: "6px",
+        }}
+      >
+        <div
+          onClick={() => {
+            setaddMember(!addMember);
+            setmodify_mem(0);
+          }}
+          className={styles.modify_mem}
+          style={{ borderBottom: "1px solid rgba(0,0,0,0.2)" }}
+        >
+          <FontAwesomeIcon
+            icon={faPlus}
+            style={{ opacity: "0.4", marginRight: "5px" }}
+          />
+          팀원 추가
+        </div>
+        <div
+          onClick={() => {
+            setdelete_mem(!delete_mem);
+            setmodify_mem(0);
+          }}
+          className={styles.modify_mem}
+        >
+          <FontAwesomeIcon
+            icon={faMinus}
+            style={{ opacity: "0.4", marginRight: "5px" }}
+          />
+          팀원 삭제
+        </div>
+      </div>
+    ) : (
+      ""
+    )}
+
+    {/* TEAM 멤버 삭제 버튼 */}
+    {delete_mem ? (
+      <div style={{ position: "absolute", right: "-85px", bottom: "30px" }}>
+        <button
+          onClick={() => {
+            set_minus_member([]);
+            setdelete_mem(0);
+          }}
+          className={styles.deletebtn}
+          style={{ marginRight: "6px" }}
+        >
+          취소
+        </button>
+        <button onClick={delete_member} className={styles.deletebtn}>
+          삭제
+        </button>
+      </div>
+    ) : (
+      ""
+    )}
+
+    {/* MEMBER LIST */}
+    {click ? (
+      <ul
+        className={`${styles.Memberlist} ${styles.visible}`}
+        style={{ position: "relative" }}
+      >
+        {/* MEMBER LIST - HEADER */}
+        <li className={styles.Memberheader}>
+          {member.length != 1 && Team.owner && (
+            <FontAwesomeIcon
+              icon={faAngleRight}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                setmodify_mem(!modify_mem);
+                setclick_pos(-1);
+                setclick_btn(0);
+              }}
+              style={{
+                position: "absolute",
+                right: "15px",
+                opacity: "0.5",
+              }}
             />
-            {/*TEAM btn (팀 수정, 캘린더)*/}
-            {click_btn ? 
-            <div ref={btnRef} style={{position: "absolute", right: Team.owner ? "-65px" : "-20px", top:"60px", color:"rgba(0,0,0,0.6)", display:"flex", border:"1px solid rgba(0,0,0,0.2)", borderRadius: "6px", overflow:"hidden"}}>               
-              <div onClick={()=>setCalendar(!calendar)}  className={styles.team_btn} style={{borderRight:"1px solid rgba(0,0,0,0.2)"}} >
-                <FontAwesomeIcon icon={faCalendar} style={{opacity:"0.5"}}/>
-              </div> 
-              {Team.owner ? <div onClick={()=>setmodify(!modify)} className={styles.team_btn} >
-                <FontAwesomeIcon icon={faPen} style={{opacity:"0.6"}}/>
-              </div> :""}
-            </div>: ""}
+          )}
+          <div style={{ display: "flex" }}>
+            <p className={styles.Memberimgdata}>NAME</p>
+            <p className={styles.Memberimgdata} style={{ marginLeft: "30px" }}>
+              POSITION
+            </p>
+          </div>
+          <p
+            style={{
+              width: "70px",
+              marginRight: "15px",
+              textAlign: "center",
+            }}
+          >
+            ROLE
+          </p>
+        </li>
 
-            {/*TEAM 수정 모달*/}
-            {modify ? modify_Teamname_modal() : ""}
+        {/* MEMBER LIST - DATA */}
+        {member.map((item, key) => (
+          <Membercomponent
+            key={key}
+            name={item.name}
+            position={item.team_role}
+            role={item.owner ? "owner" : "member"}
+            member_id={item.member_id}
+            member_img={item.image_url}
+            addMember={addMember}
+            AddTeammember={AddTeammember}
+            delete_mem={delete_mem}
+            minus_member={minus_member}
+            set_minus_member={set_minus_member}
+            me={me}
+            click_pos={click_pos}
+            setclick_pos={setclick_pos}
+            posbtnRef={posbtnRef}
+            my_pos={my_pos}
+            modifyPos={modifyPos}
+          />
+        ))}
 
-            {/*TEAM 멤버 수정 모달*/}
-            {member.length != 1 && Team.owner && modify_mem ?
-            <div ref={btnRef} style={{position: "absolute", right:"-75px", top:"170px", fontSize:"14px", border:"1px solid rgba(0,0,0,0.2)", borderRadius:"6px"}}>
-              <div onClick={()=>{setaddMember(!addMember); setmodify_mem(0);}} className={styles.modify_mem} style={{borderBottom:"1px solid rgba(0,0,0,0.2)"}}>
-                <FontAwesomeIcon icon={faPlus} style={{opacity:"0.4", marginRight:"5px"}}/>
-                팀원 추가
-              </div>
-              <div onClick={()=>{setdelete_mem(!delete_mem); setmodify_mem(0);}} className={styles.modify_mem}>
-                <FontAwesomeIcon icon={faMinus} style={{opacity:"0.4", marginRight:"5px"}}/>
-                팀원 삭제
-              </div>
-            </div> : ""}
-
-            {/*TEAM 멤버 삭제 버튼*/}
-            {delete_mem ?
-            <div style={{position: "absolute", right:"-85px", bottom: "30px"}}>
-              <button onClick={()=>{set_minus_member([]); setdelete_mem(0);}}className={styles.deletebtn} style={{marginRight:"6px"}}>취소</button>
-              <button onClick={delete_member} className={styles.deletebtn}>삭제</button>
-            </div> : ""}
-
-            {/*MEMBER LIST*/}
-            <ul className={`${styles.Memberlist} ${click==0 ? styles.hidden : styles.visible}`} style={{position:"relative"}}>
-                {/*MEMBER LIST - HEADER*/}  
-                <li className={styles.Memberheader}>
-                    {member.length != 1 && Team.owner &&
-                    <FontAwesomeIcon icon={faAngleRight} 
-                    onMouseDown={(e)=>{e.stopPropagation(); setmodify_mem(!modify_mem); setclick_pos(-1); setclick_btn(0)}} 
-                    style={{position:"absolute", right: "15px", opacity:"0.5"}}/>}
-                    <div style={{display:"flex"}}>
-                        <p className={styles.Memberimgdata}>NAME</p>
-                        <p className={styles.Memberimgdata} style={{marginLeft:"30px"}}>POSITION</p>
-                    </div>
-                        <p style={{width:"70px", marginRight:"15px", textAlign:"center"}}>ROLE</p>
-                        
-                </li>
-                {/*MEMBER LIST - DATA*/}
-                {member.map((item, key)=>
-                  <Membercomponent 
-                  key={key} name={item.name} position={item.team_role} role={item.owner?"owner":"member"} member_id={item.member_id} member_img={item.image_url}
-                  addMember={addMember} AddTeammember={AddTeammember} delete_mem={delete_mem} minus_member={minus_member} set_minus_member={set_minus_member}
-                  me={me} click_pos={click_pos} setclick_pos={setclick_pos} posbtnRef={posbtnRef} my_pos={my_pos} modifyPos={modifyPos}>
-                  </Membercomponent>
-                )}
-
-                {member.length === 1?
-                    <div onClick={()=>{setaddMember(!addMember); setclick_pos(-1);}} className={styles.add_team}>
-                      <i class="fas fa-user-plus fa-lg" style={{opacity:"0.4", marginRight:"10px"}}></i>
-                      <p style={{marginBottom:"2px"}}>팀원을 모집하세요.</p>
-                    </div> : ""}
-            </ul>
-        </section>
-    )
+        {member.length === 1 ? (
+          <div
+            onClick={() => {
+              setaddMember(!addMember);
+              setclick_pos(-1);
+            }}
+            className={styles.add_team}
+          >
+            <i
+              className="fas fa-user-plus fa-lg"
+              style={{ opacity: "0.4", marginRight: "10px" }}
+            ></i>
+            <p style={{ marginBottom: "2px" }}>팀원을 모집하세요.</p>
+          </div>
+        ) : (
+          ""
+        )}
+      </ul>
+    ) : (
+      ""
+    )}
+  </section>
+)
 }, (prevProps, nextProps) => {
     // true 반환 시 리렌더링 안 함, false 면 리렌더링 함
     return (

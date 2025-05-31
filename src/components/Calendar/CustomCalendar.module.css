@@ -1,0 +1,39 @@
+.calendarWrapper {
+  padding: 16px;
+  background-color: #fdfdfd;
+}
+
+.deleteButton {
+  margin-bottom: 12px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background-color: #c9302c;
+}
+
+:global(.rbc-toolbar) {
+  display: flex;
+  max-width: 100%;
+  justify-content: flex-end;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* 이벤트 박스 커스터마이징 */
+:global(.rbc-event) {
+  padding: 1px 4px !important;
+  font-size: 10px !important;
+  line-height: 12px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
