@@ -8,7 +8,7 @@ const Header = () => {
     <div className={styles.wrapper}>
       <div className={styles.top}>
         <Link to="/" className={styles.logo}>
-          <img src={Devmatch} style={{width: "130px", height:"58px;", marginTop : "10px"}}></img>
+          <img src={Devmatch} style={{width: "130px", height:"58px", marginTop : "10px"}}></img>
         </Link>
         <div className={styles.items}>
           <Link to="/project" className={styles.noUnderline}>

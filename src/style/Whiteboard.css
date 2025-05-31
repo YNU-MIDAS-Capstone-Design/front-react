@@ -1,0 +1,60 @@
+.tlui-layout__top {
+  width: 100% !important;
+  justify-content: space-between !important;
+}
+
+.tlui-menu-zone {
+    width: 345.6px !important;
+}
+
+.tlui-toolbar-container.tlui-buttons__horizontal{
+    width: 184px !important;
+}
+
+.tlui-button.tlui-button__icon, .tlui-button.tlui-button__icon.tlui-navigation-panel__toggle{
+    width: 40px !important;
+}
+
+
+.tlui-toolbar-container-tlui-toolbar__tools .tlui-popover{
+  width: 40px !important;
+}
+
+.tlui-navigation-panel{
+    width: 96px !important;
+}
+
+@keyframes rotate {
+        0% {
+          transform: rotateZ(0deg);
+        }
+        100% {
+          transform: rotateZ(180deg);
+        }
+      }
+.loading_round {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 120px;
+        display: flex;
+      }
+
+.loading_round {
+    justify-content: space-between;
+    animation: rotate 1s ease-in-out infinite;
+}
+
+.loading_round div{
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    background-color: rgb(73, 119, 236);
+}
+
+.Memberimg{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}

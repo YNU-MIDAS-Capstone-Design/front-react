@@ -14,6 +14,9 @@ import Project from "./pages/Project";
 import Userpage from "./pages/MyPage/UserPage";
 import MbtiTest from "./pages/Userstyle/MbtiTest";
 import UserStyle from "./pages/Userstyle/UserStyle";
+import Teamboard from "./pages/Community/Teamboard";
+import Whiteboard from './pages/Community/Whiteboard'; 
+
 
 function App() {
   return (
@@ -34,6 +37,8 @@ function App() {
           <Route path="/project" element={<Project />} />
           <Route path="/team" element={<Team />} />
           <Route path="/user/:nickname" element={<Userpage />} />
+          <Route path="/whiteboard/:teamId" element={<Whiteboard />} />
+          <Route path="/teamboard" element={<Teamboard/>} />
         </Routes>
       </Template>
     </Router>

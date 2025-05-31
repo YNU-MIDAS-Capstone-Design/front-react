@@ -10,7 +10,7 @@ import CustomCalendar from "../../components/Calendar/CustomCalendar"
 
 //>> Component
 /* ✅ 팀 카드  */
-const Teamcard = React.memo(({ Team, onClick, getbgColor, setclick_pos, setclick_btn, click_btn }) => {
+const Teamcard = React.memo(({ Team, onClick, getbgColor, setclick_pos, setclick_btn, click_btn, setmodify_mem }) => {
     return (
     <div onClick={onClick} className={styles.Teamcard}>
         {Team.team_image.startsWith('hsl(') ?
@@ -24,7 +24,7 @@ const Teamcard = React.memo(({ Team, onClick, getbgColor, setclick_pos, setclick
         <div className={styles.rolebadge}>{Team.owner ? "owner" : "member"}</div>
         <div className={styles.TeamSet} onClick={(e) => {e.stopPropagation();}}>
             <FontAwesomeIcon icon={faEllipsisVertical} 
-            onMouseDown={(e) => {e.stopPropagation(); setclick_pos(-1); setclick_btn(!click_btn); console.log(`btn${click_btn}`)}} 
+            onMouseDown={(e) => {e.stopPropagation(); setclick_pos(-1); setclick_btn(!click_btn); setmodify_mem(0);}} 
               style={{height:"20px", width:"20px", opacity:"0.4"}}/>
         </div>
         </div>
@@ -65,7 +65,7 @@ const Teamcard = React.memo(({ Team, onClick, getbgColor, setclick_pos, setclick
                   <img onClick={() => me !== name && !delete_mem ? navigate(`/user/${name}`) : ""} className={styles.Memberimg} src = {member_img===null ? profile : member_img} alt="memberprofile"></img>
                   <p className={styles.Memberimgdata}>{name}</p>
                   {me == name && position != null ? 
-                    <div onMouseDown={(e)=>{e.stopPropagation();if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.Memberimgdata} style={{marginLeft:"25px", textAlign:"center"}}>
+                    <div onMouseDown={(e)=>{e.stopPropagation(); if(click_pos==-1) {setclick_pos(true)} else setclick_pos(!click_pos)}} className={styles.Memberimgdata} style={{marginLeft:"25px", textAlign:"center"}}>
                       <span className={styles.button} style={{fontSize:"14px"}}>{position}</span>
                     </div> : 
                     <><p className={styles.Memberimgdata} style={{textAlign:"center", marginLeft:"25px"}}>{position}</p></>
@@ -110,11 +110,11 @@ function Member(props){
     const my_pos = ["백엔드", "프론트", "디자이너", "모바일", "인공지능", "게임"];
 
     const handleTeamClick = useCallback(() => {
-  setclick((c) => !c);
-  setCalendar(false);  // ✅ 캘린더 닫기
-  getMemberlist();
-  setclick_pos(-1);
-}, []);
+      setclick((c) => !c);
+      setCalendar(false);  // ✅ 캘린더 닫기
+      getMemberlist();
+      setclick_pos(-1);
+    }, []);
 
 
     {/* 버튼 외부 감지 */}
@@ -565,7 +565,7 @@ function Member(props){
     }
 
     return (
-  <section style={{ position: "relative" }}>
+  <section style={{ position: "relative", marginBottom:"30px"}}>
     {/* TEAM CARD */}
     <Teamcard
       Team={Team}
@@ -574,6 +574,7 @@ function Member(props){
       setclick_pos={setclick_pos}
       click_btn={click_btn}
       setclick_btn={setclick_btn}
+      setmodify_mem={setmodify_mem}
     />
 
     {/* TEAM btn (팀 수정, 캘린더) */}
@@ -582,35 +583,33 @@ function Member(props){
         ref={btnRef}
         style={{
           position: "absolute",
-          right: Team.owner ? "-65px" : "-20px",
+          right: Team.owner ? "-85px" : "-40px",
           top: "60px",
           color: "rgba(0,0,0,0.6)",
           display: "flex",
-          border: "1px solid rgba(0,0,0,0.2)",
+          border: "1px solid rgba(0,0,0,0.3)",
           borderRadius: "6px",
-          overflow: "hidden",
+          overflow: "hidden"
         }}
+        className={`${ !Team.owner&&click_btn ? styles.click_btn : Team.owner&&click_btn ? styles.click_pos : ""}`}
       >
         {/* 캘린더 버튼 */}
         <div
           onClick={() => {
-            setCalendar((prev) => !prev);
-            setclick(false);
-            setmodify(false);
+            setclick_btn(!click_btn);
+            setCalendar(!calendar);
           }}
           className={styles.team_btn}
-          style={{ borderRight: "1px solid rgba(0,0,0,0.2)" }}
+          style={{ borderRight: Team.owner ? "1px solid rgba(0,0,0,0.3)" : ""}}
         >
-          <FontAwesomeIcon icon={faCalendar} style={{ opacity: "0.5" }} />
+          <FontAwesomeIcon icon={faCalendar} style={{ opacity: "0.5"}} />
         </div>
 
         {/* 수정 버튼 */}
         {Team.owner ? (
           <div
             onClick={() => {
-              setmodify((prev) => !prev);
-              setclick(false);
-              setCalendar(false);
+              setmodify(!modify);
             }}
             className={styles.team_btn}
           >
@@ -642,6 +641,7 @@ function Member(props){
           border: "1px solid rgba(0,0,0,0.2)",
           borderRadius: "6px",
         }}
+        className={`${modify_mem ? styles.click_btn : ""}`}
       >
         <div
           onClick={() => {

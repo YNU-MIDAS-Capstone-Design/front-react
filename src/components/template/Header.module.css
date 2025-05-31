@@ -7,6 +7,7 @@
   height: 80px;
   box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
   z-index: 1100;
+  border-bottom: 1px solid rgb(229, 229, 229);
 }
 .top {
   display: flex;
