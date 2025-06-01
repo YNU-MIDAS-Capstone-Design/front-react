@@ -5,7 +5,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import axios from "axios";
-import styles from "./CustomCalendar.module.css";  // ✅ CSS 모듈 import
+import styles from "./CustomCalendar.module.css"; // ✅ CSS 모듈 import
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop(Calendar);
@@ -64,19 +64,10 @@ export default function CustomCalendar({ teamId }) {
     fetchEvents();
   }, [teamId, currentDate]);
 
-  const handleSelectSlot =async ({ start, end }) => {
-    const selectedDate = formatDate(start);
+  const handleSelectSlot = async ({ start, end }) => {
     const adjustedEnd = new Date(end);
-    adjustedEnd.setDate(adjustedEnd.getDate()-1);
-    const totalEventsToday = [...events, ...localEvents].filter(
-    (e) => formatDate(e.start) === selectedDate
-  ).length;
+    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
 
-  if (totalEventsToday >= 3) {
-    alert("해당 날짜에는 이미 3개의 일정이 있습니다.");
-    return;
-  }
-    
     const title = window.prompt("일정 제목을 입력하세요");
     if (!title) return;
 
@@ -124,7 +115,7 @@ export default function CustomCalendar({ teamId }) {
   const handleEventDrop = async ({ event, start, end }) => {
     try {
       const adjustedEnd = new Date(end);
-    adjustedEnd.setDate(adjustedEnd.getDate() + 1);
+      adjustedEnd.setDate(adjustedEnd.getDate() + 1);
       await axios.put(
         `/api/myteams/team/calendar/${event.id}/modify`,
         {
@@ -143,7 +134,7 @@ export default function CustomCalendar({ teamId }) {
   const handleEventResize = async ({ event, start, end }) => {
     try {
       const adjustedEnd = new Date(end);
-    adjustedEnd.setDate(adjustedEnd.getDate() + 1);
+      adjustedEnd.setDate(adjustedEnd.getDate() + 1);
       await axios.put(
         `/api/myteams/team/calendar/${event.id}/modify`,
         {
