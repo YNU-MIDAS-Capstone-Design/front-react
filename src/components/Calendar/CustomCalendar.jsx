@@ -66,7 +66,7 @@ export default function CustomCalendar({ teamId }) {
 
   const handleSelectSlot = async ({ start, end }) => {
     const adjustedEnd = new Date(end);
-    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+    adjustedEnd.setDate(adjustedEnd.getDate());
 
     const title = window.prompt("일정 제목을 입력하세요");
     if (!title) return;
