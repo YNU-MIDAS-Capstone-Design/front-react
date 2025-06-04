@@ -1,9 +1,11 @@
 import styles from "./Header.module.css";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import Devmatch from "../../assets/DevMatch.png"
 
 const Header = () => {
-  const token = localStorage.getItem("accessToken");
+  const { token, logoutAuth } = useAuth();
+  
   return (
     <div className={styles.wrapper}>
       <div className={styles.top}>
@@ -20,10 +22,7 @@ const Header = () => {
           <Link to="/mypage" className={styles.noUnderline}>
             Mypage
           </Link>
-          {token? (<div className={styles.noUnderline} onClick={()=> {
-            localStorage.removeItem("accessToken")
-            window.location.reload();
-          }}>Logout</div>) 
+          {token? (<div className={styles.noUnderline} onClick={logoutAuth}>Logout</div>) 
           :(<>
           <Link to="/login" className={styles.noUnderline}>
             Login

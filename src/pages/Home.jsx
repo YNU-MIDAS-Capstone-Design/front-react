@@ -257,7 +257,7 @@ const Home = () => {
       setNotiCount(res.data.count);
     })
     .catch(()=>{
-      alert("오류가 발생했습니다.");
+      // console.err("오류가 발생했습니다.");
     })
   }
 
@@ -307,7 +307,11 @@ const Home = () => {
                   [styles.active]:
                     favorites[key]?.[index + slideState[key] * 3],
                 })}
-                onClick={() => toggleFavorite(key, index + slideState[key] * 3)}
+                
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(key, index + slideState[key] * 3);
+                }}
               >
                 ★
               </button>

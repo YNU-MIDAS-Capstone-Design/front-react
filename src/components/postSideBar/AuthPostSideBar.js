@@ -7,10 +7,32 @@ import classNames from "classnames";
 import axios from "axios";
 
 const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
-  const [modalType, setModalType] = useState(""); // 모달 타입: 'share', 'volunteer'
+  const [modalType, setModalType] = useState(""); // 모달 타입: 'share', 'volunteer', 'addUser'
   const [selectedUser, setSelectedUser] = useState(""); // addUser용
   const [active, setActive] = useState("");
   const [volunteered , setVolunteered] = useState(false);
+  const [applicants, setApplicants] = useState([]); 
+
+  const getApplicants = () =>{
+    axios.get(`/api/project/${projectId}/applicants`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((res)=>{
+      console.log(res.data)
+      setApplicants(res.data.applicants);
+    })
+    .catch((err) => {
+    console.error("지원자 정보를 불러오는 데 실패했습니다:", err);
+   });
+  }
+
+  useEffect(() => {
+    if (token && projectId) {
+      getApplicants();
+    }
+  }, [token, projectId]);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -122,6 +144,8 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
         if(volunteered) toggleCancel();
         else toggleVolunteer();
         break;
+      case "addUser":
+
       default:
         break;
     }
@@ -136,6 +160,8 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
         return volunteered
         ? <p>이 프로젝트 지원을 취소하시겠습니까?</p> 
         : <p>이 프로젝트에 지원하시겠습니까?</p>;
+      case "addUser":
+        return <p>선택한 지원자: <strong>{selectedUser}</strong></p>;
       default:
         return null;
     }
@@ -148,12 +174,12 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
           <div>
             <div className={styles.authorBar}>
               <span className={styles.title}>지원 현황</span>
-              <span className={styles.member} onClick={() => openModal("addUser", "user1")}>
-                user1(모집)
-              </span>
-              <span className={styles.volunteer} onClick={() => openModal("addUser", "user2")}>
-                user2
-              </span>
+              {applicants.map((applicant, index) => (
+                <div key={index}>
+                  <span className={styles.volunteer} onClick={() => openModal("addUser", applicant)}>{applicant}</span>
+                  {/* <span className={styles.volunteer} onClick={() => navigator.clipboard.writeText(applicant)}>{applicant}</span> */}
+                </div>
+              ))}
             </div>
           </div>
         ) : (
@@ -171,12 +197,20 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
             {{
               share: "공유하기",
               volunteer: "지원하기",
+              addUser: "지원자",
             }[modalType]}
           </h2>
           {renderModalContent()}
           <div style={{ marginTop: "16px", display: "flex", gap: "8px" }}>
-            <button className={styles.modalBtnAccept} onClick={handleConfirm}>확인</button>
-            <button className={styles.modalBtnCancel}onClick={closeModal}>취소</button>
+            {modalType === "addUser" ? (
+              <>
+                <button className={styles.modalBtnAccept} onClick={()=>{window.location.href = `/user/${selectedUser}`;}}>프로필 보기</button>
+                <button className={styles.modalBtnCancel} onClick={() => {navigator.clipboard.writeText(selectedUser); closeModal();}}>닉네임 복사</button>
+              </>) : (
+              <>
+                <button className={styles.modalBtnAccept} onClick={handleConfirm}>확인</button>
+                <button className={styles.modalBtnCancel}onClick={closeModal}>취소</button>
+              </>)}
           </div>
         </Box>
       </Modal>

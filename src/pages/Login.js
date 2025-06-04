@@ -5,9 +5,11 @@ import googleLogo from "../assets/google.png";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 const Login = () => {
     const navigate = useNavigate();
+    const { loginAuth } = useAuth();
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
@@ -40,7 +42,8 @@ const Login = () => {
           .then((res=>{
             const token = res.data.token;
             localStorage.setItem("accessToken", token);
-            alert("로그인 되었습니다");
+            // alert("로그인 되었습니다");
+            loginAuth(token);
             navigate("/");
           }))
           .catch((err)=>{
@@ -60,24 +63,28 @@ const Login = () => {
         <>
         <div className={styles.wrapper}>
             <div style={{fontWeight: "bold", fontSize: "36px"}}>로그인</div>
-            <div className={styles.loginBox}>
+            <form className={styles.loginBox} onSubmit={(e)=>{
+                e.preventDefault();
+                login(e);
+            }}>
                 <div className={styles.infoBox}>
                     <input type="text" name="nickname" value={info.nickname} className={styles.infoItem} placeholder="NickName" onChange={handleChange}/>
                     <input type="password" name="password" value={info.password} className={styles.infoItem}placeholder="Password" onChange={handleChange}/>
                 </div>
-                <button className={styles.loginBtn} onClick={(e)=>(login(e))}>Login</button>
+                <button type="submit" className={styles.loginBtn} onClick={(e)=>(login(e))}>Login</button>
                 {errorMessage && (
                     <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
                 )}
-                <div className={styles.socialLogin}>
+                {/* <div className={styles.socialLogin}>
                     login with Social Account
                     <div className={styles.logoBox}>
                         <img src = {naverLogo} alt="Naver Logo" className={styles.logo}/>
                         <img src = {kakaoLogo} alt="kakao Logo" className={styles.logo}/>
                         <img src = {googleLogo} alt="google Logo" className={styles.logo}/>
                     </div>
-                </div>
-            </div>
+                </div> */}
+            </form>
+            
         </div>
         </>
     )

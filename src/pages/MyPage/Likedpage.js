@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../style/Likedpage.module.css"
 import Sidebar from "../../components/template/Sidebar"
 import axios from "axios";
@@ -83,11 +84,17 @@ function Likedpage(){
       }
     };
 
-    const ProjectCard=({title, content, stacklist})=>{
+    const navigate = useNavigate();
+    const handleProjectClick = (projectId) => {
+      navigate(`/Post/${Number(projectId)}`);
+    }
+
+    const ProjectCard=({title, content, stacklist, onClick,})=>{
         return(
             <div className={styles.project_card} 
                         style={{display:"flex", flexDirection:"column", width:"900px", height:"130px", boxSizing:"border-box", border: "1px solid rgba(0,0,0,0.15)", 
-                        borderRadius:"10px", padding: "20px 30px", gap:"5px"}}>
+                        borderRadius:"10px", padding: "20px 30px", gap:"5px"}}
+                        onClick={onClick}>
                             <p style={{fontSize:"20px", fontWeight:"500"}}>{title}</p>
                             <div className={styles.ellipsis_2_lines} style={{color:"rgba(0,0,0,0.7)"}}>
                                 {content} </div>
@@ -116,7 +123,8 @@ function Likedpage(){
                     </div>
                     <div className={styles.body}> 
                         {project?.map((item, key)=>(
-                            <ProjectCard key={key} title={item.title} content={item.content} stacklist={item.stackList}/>
+                            <ProjectCard key={key} title={item.title} content={item.content} stacklist={item.stackList}
+                            onClick={() => handleProjectClick(item.project_id)}/>
                         ))}
                     </div>
             </div>

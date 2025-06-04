@@ -20,6 +20,7 @@
 }
 .top{
     margin: 50px auto;
+    width: 950px;
 }
 .title{
     font-size: 36px;
@@ -68,6 +69,7 @@
 .postContent{
     line-height: 32px;
     font-size: 20px;
+    white-space: pre-line;
 }
 
 .sideBar{

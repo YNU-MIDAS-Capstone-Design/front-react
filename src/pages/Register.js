@@ -5,9 +5,11 @@ import googleLogo from "../assets/google.png";
 import axios from "axios";
 import React , { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { loginAuth } = useAuth();
   const [errorMessage, setErrorMessage] = useState("");
 
   const [form, setForm] = useState({
@@ -15,7 +17,7 @@ const Register = () => {
     email: "",
     password: "",
     bio: "",
-    location: "",
+    location: "경상북도",
     sns: "",
     mbti: "",
     job: "",
@@ -40,9 +42,11 @@ const Register = () => {
       })
       .then((res)=>{
         alert("회원가입 되었습니다!");
-        navigate("/login");
+        login();
       })
       .catch((err)=>{
+        console.error(err.response);
+
         if(err.response?.status === 400){
           alert("이메일 형식 오류 입입니다.")
         }
@@ -60,12 +64,45 @@ const Register = () => {
         }
       })
   }
-  
+
+  const login =()=>{
+    const info = {
+      nickname:form.nickname,
+      password:form.password
+    }
+    axios.post("/api/auth/login",info,{
+        headers: {
+          'Content-Type': 'application/json'
+        }   
+      })
+      .then((res=>{
+        const token = res.data.token;
+        localStorage.setItem("accessToken", token);
+        loginAuth(token);
+        navigate("/UserStyle");
+      }))
+      .catch((err)=>{
+        if (err.response?.status === 400){
+            setErrorMessage("로그인 시간이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        else if (err.response?.status === 401) {
+            setErrorMessage("로그인 정보가 잘못되었습니다. 다시 시도해주세요.");
+          }
+        else{
+            setErrorMessage("죄송합니다. 다시 시도해주세요.")
+        }
+      })
+    }
   return(
       <>
       <div className={styles.wrapper}>
           <div style={{fontWeight: "bold", fontSize: "36px"}}>회원가입</div>
-          <div className={styles.registerBox}>
+          <div className={styles.registerBox}
+          // onSubmit={(e)=>{
+          //   e.preventDefault();
+          //   register(e);
+          // }}
+          >
               <div className={styles.infoBox}>
                   <input type = "text" name="nickname" value={form.nickname} placeholder="Enter your name" className={styles.infoItem} onChange={handleChange}/>
                   <input type = "email" name = "email" value={form.email} placeholder = "Email or PhoneNumber" className={styles.infoItem} onChange={handleChange}></input>
@@ -76,12 +113,12 @@ const Register = () => {
                 <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
               )}
               <div className={styles.socialLogin}>
-                  Sign up with Social Account
+                  {/* Sign up with Social Account
                   <div className={styles.logoBox}>
                       <img src = {naverLogo} alt="Naver Logo" className={styles.logo}/>
                       <img src = {kakaoLogo} alt="kakao Logo" className={styles.logo}/>
                       <img src = {googleLogo} alt="google Logo" className={styles.logo}/>
-                  </div>
+                  </div> */}
                   Already have account?
                   <a href="/login" className={styles.loginLink}>Log in</a>
               </div>

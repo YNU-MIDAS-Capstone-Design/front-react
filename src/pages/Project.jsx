@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "../style/Project.module.css";
 import axios from "axios";
 import SearchBar from "../components/template/SearchBar";
@@ -11,7 +11,10 @@ const RoleTag = ({ role }) => <span className={styles.roleTag}>{role}</span>;
 const StarButton = ({ isActive, onClick }) => (
   <button
     className={`${styles.starButton} ${isActive ? styles.active : ""}`}
-    onClick={onClick}
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick();
+    }}
   >
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
       <path
@@ -29,8 +32,9 @@ const ProjectRecruitmentCard = ({
   roles,
   isFavorite,
   onFavoriteToggle,
+  onClick,
 }) => (
-  <article className={styles.card} data-id={id}>
+  <article className={styles.card} data-id={id} onClick={onClick}>
     <StarButton isActive={isFavorite} onClick={onFavoriteToggle} />
     <header className={styles.cardHeader}>
       <h2 className={styles.cardTitle}>{title}</h2>
@@ -161,6 +165,11 @@ const ProjectList = ({
     order,
   ]);
 
+  const navigate = useNavigate();
+  const handleProjectClick = (projectId) => {
+    navigate(`/Post/${Number(projectId)}`);
+  }
+
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -187,6 +196,7 @@ const ProjectList = ({
                 roles={project.stackList}
                 isFavorite={favorites[project.project_id]}
                 onFavoriteToggle={() => toggleFavorite(project.project_id)}
+                onClick={() => handleProjectClick(project.project_id)}
               />
             ))}
           </div>
