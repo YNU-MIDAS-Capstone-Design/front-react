@@ -275,6 +275,8 @@
   flex-direction: column;
   position: relative;
   cursor: pointer;
+  max-width: 440px;
+  min-width:440px;
 }
 
 .cardHeader {
@@ -295,6 +297,23 @@
   font-size: 14px;
   color: #666;
   margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roleTagWithImage {
+  display: flex;
+  align-items: center;
+  padding: 3px 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 3px;
+  background-color: #f8f8f8;
+  font-size: 14px;
+  color: #333;
 }
 
 /* 역할 태그 */

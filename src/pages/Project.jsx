@@ -6,8 +6,6 @@ import SearchBar from "../components/template/SearchBar";
 import StackFilter from "../components/template/StackFilter";
 import LocationFilter from "../components/template/LocationFilter";
 
-const RoleTag = ({ role }) => <span className={styles.roleTag}>{role}</span>;
-
 const StarButton = ({ isActive, onClick }) => (
   <button
     className={`${styles.starButton} ${isActive ? styles.active : ""}`}
@@ -33,23 +31,47 @@ const ProjectRecruitmentCard = ({
   isFavorite,
   onFavoriteToggle,
   onClick,
-}) => (
-  <article className={styles.card} data-id={id} onClick={onClick}>
-    <StarButton isActive={isFavorite} onClick={onFavoriteToggle} />
-    <header className={styles.cardHeader}>
-      <h2 className={styles.cardTitle}>{title}</h2>
-    </header>
-    <p className={styles.cardDescription}>{description}</p>
-    <div className={styles.roleTags}>
-      {roles.slice(0, 4).map((role, index) => (
-        <RoleTag key={index} role={role} />
-      ))}
-      {roles.length > 4 && (
-        <span className={styles.roleTag}>+{roles.length - 4}</span>
-      )}
-    </div>
-  </article>
-);
+}) => {
+  const images = require.context("../assets/stack", false, /\.png$/);
+
+  return (
+    <article className={styles.card} data-id={id} onClick={onClick}>
+      <StarButton isActive={isFavorite} onClick={onFavoriteToggle} />
+      <header className={styles.cardHeader}>
+        <h2 className={styles.cardTitle}>{title}</h2>
+      </header>
+      <p className={styles.cardDescription}>{description}</p>
+
+      {/* 여기부터 기존 역할 태그 대신 바뀜 */}
+      <div className={styles.roleTags}>
+        {(roles?.slice(0, 4) || []).map((role, index) => {
+          let imgSrc = "";
+          try {
+            imgSrc = images(`./${role}.png`);
+          } catch (e) {
+            imgSrc = "";
+          }
+          return (
+            <div key={index} className={styles.roleTagWithImage}>
+              {imgSrc && (
+                <img
+                  src={imgSrc}
+                  alt={role}
+                  className={styles.roleImage}
+                  style={{ width: "20px", height: "20px", marginRight: "5px" }}
+                />
+              )}
+              <span>{role}</span>
+            </div>
+          );
+        })}
+        {roles.length > 4 && (
+          <div className={styles.roleTagWithImage}>+{roles.length - 4}</div>
+        )}
+      </div>
+    </article>
+  );
+};
 
 const ProjectList = ({
   selectedStacks,
@@ -67,16 +89,33 @@ const ProjectList = ({
   const limit = 6;
   const totalPages = Math.ceil(totalCount / limit);
 
+  // 별 버튼 토글 함수
+  const toggleFavorite = async (projectId) => {
+    const token = localStorage.getItem("accessToken");
+    try {
+      await axios.post(`/api/project/${projectId}/like`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // 좋아요 리스트 새로 불러오기
+      const likeRes = await axios.get("/api/users/me/likes", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const likedIds = likeRes.data.data.map((item) => item.project_id);
+      setFavorites((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((id) => {
+          updated[id] = likedIds.includes(parseInt(id));
+        });
+        return updated;
+      });
+    } catch (error) {
+      console.error("좋아요 실패", error);
+    }
+  };
+
   useEffect(() => {
     const keyword = searchKeyword.trim();
-    if (
-      searchTrigger === 0 &&
-      selectedStacks.length === 0 &&
-      selectedRegions.length === 0 &&
-      searchKeyword.trim() === ""
-    ) {
-    }
-
     const params = new URLSearchParams();
     params.append("page", page);
     if (order) params.append("order", order);
@@ -86,78 +125,47 @@ const ProjectList = ({
     if (keyword) params.append("keyword", keyword);
 
     const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("로그인이 만료되었습니다.");
+      return;
+    }
 
-    const isTokenExpired = (token) => {
-      if (!token) return true;
-
+    const fetchProjectsAndLikes = async () => {
       try {
-        const base64Url = token.split(".")[1]; // JWT payload 부분
-        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-        const payload = JSON.parse(window.atob(base64));
+        // 프로젝트 리스트 조회
+        const res = await axios.get(`/api/project?${params.toString()}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        const exp = payload.exp;
-        const now = Math.floor(Date.now() / 1000); // 현재 시간 (초)
+        const fetchedProjects = Array.isArray(res.data.projects)
+          ? res.data.projects
+          : [];
+        setProjects(fetchedProjects);
+        setTotalCount(res.data.totalCount || 0);
 
-        return exp < now;
-      } catch (e) {
-        console.error("토큰 디코딩 실패:", e);
-        return true; // 디코딩 실패 시 만료된 것으로 간주
+        // 좋아요 리스트 조회
+        const likeRes = await axios.get("/api/users/me/likes", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const likedIds = likeRes.data.data.map((item) => item.project_id);
+        const initialFavorites = {};
+        fetchedProjects.forEach((project) => {
+          initialFavorites[project.project_id] = likedIds.includes(
+            project.project_id
+          );
+        });
+        setFavorites(initialFavorites);
+      } catch (err) {
+        console.error("데이터 가져오기 실패", err);
+        setProjects([]);
+        setTotalCount(0);
       }
     };
 
-    if (!token || isTokenExpired(token)) {
-      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
-      // navigate("/login"); 등 처리
-    } else {
-      // 유효한 토큰 → API 요청 등 진행
-    }
-    console.log("🔐 accessToken:", token);
-
-    const query = [
-      `page=${page}`,
-      `order=${order}`,
-      processOnly ? `process=true` : null,
-      keyword ? `keyword=${encodeURIComponent(keyword)}` : null,
-      ...selectedRegions.map((r) => `location=${encodeURIComponent(r)}`),
-      ...selectedStacks.map((s) => `stacks=${encodeURIComponent(s)}`),
-    ]
-      .filter(Boolean)
-      .join("&");
-
-    axios
-      .get(`/api/project?${query}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data.code === "SU") {
-          const fetchedProjects = Array.isArray(res.data.projects)
-            ? res.data.projects
-            : [];
-          setProjects(fetchedProjects);
-          setTotalCount(res.data.totalCount || 0);
-          setPage(res.data.page || 0);
-
-          const initialFavorites = {};
-          fetchedProjects.forEach((project) => {
-            initialFavorites[project.project_id] = false;
-          });
-          setFavorites(initialFavorites);
-        } else {
-          setProjects([]); // 실패 시 명시적으로 빈 배열
-          setTotalCount(0);
-          setPage(0);
-        }
-      })
-      .catch((err) => {
-        console.warn("백엔드 연결 실패.");
-        setProjects([]);
-        setTotalCount(0);
-        setPage(0);
-      });
+    fetchProjectsAndLikes();
   }, [
-    searchTrigger, // 버튼 누를 때만 증가
+    searchTrigger,
     page,
     selectedStacks,
     selectedRegions,
@@ -168,10 +176,6 @@ const ProjectList = ({
   const navigate = useNavigate();
   const handleProjectClick = (projectId) => {
     navigate(`/Post/${Number(projectId)}`);
-  }
-
-  const toggleFavorite = (id) => {
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const isFiltered =
@@ -192,9 +196,9 @@ const ProjectList = ({
                 key={project.project_id}
                 id={project.project_id}
                 title={project.title}
-                description={project.description}
+                description={project.content}
                 roles={project.stackList}
-                isFavorite={favorites[project.project_id]}
+                isFavorite={favorites[project.project_id] || false}
                 onFavoriteToggle={() => toggleFavorite(project.project_id)}
                 onClick={() => handleProjectClick(project.project_id)}
               />
