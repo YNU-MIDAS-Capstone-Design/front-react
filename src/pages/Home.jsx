@@ -8,8 +8,12 @@ import banner2 from "../assets/banner22.png";
 import StackFilter from "../components/template/StackFilter";
 import SearchBar from "../components/template/Homesearch";
 import AlarmButton from "../components/alarmButton/AlarmButton";
+const images = require.context("../assets/stack", false, /\.png$/);
 
-const banners = [banner1, banner2];
+const banners = [
+  { image: banner1, projectId: 3 },
+  { image: banner2, projectId: 1 },
+];
 
 const dummyData = {
   recent: [
@@ -147,11 +151,8 @@ const dummyData = {
 
 const Home = () => {
   const [data, setData] = useState({ popular: [], recommend: [], recent: [] });
-  const [favorites, setFavorites] = useState({
-    popular: Array(6).fill(false),
-    recommend: Array(6).fill(false),
-    recent: Array(6).fill(false),
-  });
+  const [favorites, setFavorites] = useState({});
+
   const [slideState, setSlideState] = useState({
     popular: 0,
     recommend: 0,
@@ -166,35 +167,52 @@ const Home = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedStacks, setSelectedStacks] = useState([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [notiCount, setNotiCount] = useState({count: 0});
+  const [notiCount, setNotiCount] = useState({ count: 0 });
 
   const [isAlarmOpen, setIsAlarmOpen] = useState(false);
   const toggleAlarm = () => {
-    setIsAlarmOpen(prev => !prev);
+    setIsAlarmOpen((prev) => !prev);
   };
 
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
 
   useEffect(() => {
-    axios
-      .get("/api/home", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
+    const fetchData = async () => {
+      try {
+        // 1단계: 홈 데이터 불러오기
+        const res = await axios.get("/api/home", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         if (res.data.code === "SU") {
           setData({
             recent: res.data.recent || [],
             popular: res.data.popular || [],
             recommend: res.data.recommend || [],
           });
+
+          // 2단계: 좋아요 데이터 불러오기
+          const likeRes = await axios.get("/api/users/me/likes", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const likedIds = likeRes.data.data.map((item) => item.project_id);
+
+          // 3단계: 좋아요 상태 초기화 (섹션별 key로 관리)
+          const initialFavorites = {};
+          ["recent", "popular", "recommend"].forEach((section) => {
+            res.data[section]?.forEach((project) => {
+              initialFavorites[`${section}-${project.project_id}`] =
+                likedIds.includes(project.project_id);
+            });
+          });
+
+          setFavorites(initialFavorites);
         } else {
           setErrorMessage(`[${res.data.code}] ${res.data.message}`);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.warn("백엔드 연동 실패. 더미 데이터를 사용합니다.");
         setData(dummyData);
 
@@ -206,8 +224,12 @@ const Home = () => {
         } else {
           setErrorMessage("");
         }
-      });
+      }
+
       alarmCount();
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -221,6 +243,14 @@ const Home = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [totalSlides]);
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
   };
@@ -229,11 +259,23 @@ const Home = () => {
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
-  const toggleFavorite = (section, index) => {
-    setFavorites((prev) => ({
-      ...prev,
-      [section]: prev[section].map((fav, i) => (i === index ? !fav : fav)),
-    }));
+  const toggleFavorite = async (section, index) => {
+    const job = data[section][index];
+    const projectId = job.project_id;
+
+    try {
+      await axios.post(`/api/project/${projectId}/like`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const key = `${section}-${projectId}`;
+      setFavorites((prev) => ({
+        ...prev,
+        [key]: !prev[key],
+      }));
+    } catch (err) {
+      console.error("좋아요 요청 실패", err);
+    }
   };
 
   const nextJobSectionSlide = (key) => {
@@ -246,20 +288,21 @@ const Home = () => {
     setSlideState((prev) => ({ ...prev, [key]: (prev[key] - 1 + max) % max }));
   };
 
-  const alarmCount =()=>{
-    axios.get(`/api/notifications/unread-count`,{
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    .then((res)=>{
-      console.log(res.data.count);
-      setNotiCount(res.data.count);
-    })
-    .catch(()=>{
-      // console.err("오류가 발생했습니다.");
-    })
-  }
+  const alarmCount = () => {
+    axios
+      .get(`/api/notifications/unread-count`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.count);
+        setNotiCount(res.data.count);
+      })
+      .catch(() => {
+        // console.err("오류가 발생했습니다.");
+      });
+  };
 
   const renderSection = (title, key) => {
     const max = Math.ceil(data[key].length / 3);
@@ -271,8 +314,6 @@ const Home = () => {
     const handleProjectClick = (projectId) => {
       navigate(`/Post/${Number(projectId)}`);
     };
-
-
 
     return (
       <section className={styles.popularJobListings}>
@@ -301,13 +342,15 @@ const Home = () => {
 
         <div className={styles.jobListingsContainer}>
           {jobsToShow.map((job, index) => (
-            <div key={job.project_id} className={styles.jobCard} onClick={() => handleProjectClick(job.project_id)}>
+            <div
+              key={job.project_id}
+              className={styles.jobCard}
+              onClick={() => handleProjectClick(job.project_id)}
+            >
               <button
                 className={classNames(styles.starButton, {
-                  [styles.active]:
-                    favorites[key]?.[index + slideState[key] * 3],
+                  [styles.active]: favorites[`${key}-${job.project_id}`],
                 })}
-                
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleFavorite(key, index + slideState[key] * 3);
@@ -315,16 +358,39 @@ const Home = () => {
               >
                 ★
               </button>
+
               <h3 className={styles.jobTitle}>{job.title}</h3>
-              <p className={styles.jobDescription}>{job.description}</p>
-              <div className={styles.stackList}>
-                {job.stackList?.slice(0, 3).map((stack, i) => (
-                  <span key={i} className={styles.stackItem}>
-                    {stack}
-                  </span>
-                ))}
+              <p className={styles.jobDescription}>{job.content}</p>
+              <div
+                className={styles.stackList}
+                style={{
+                  display: "flex",
+                  flexWrap: "nowrap",
+                  alignItems: "center",
+                }}
+              >
+                {job.stackList?.slice(0, 3).map((stack, i) => {
+                  let imgSrc;
+                  try {
+                    imgSrc = images(`./${stack}.png`);
+                  } catch (e) {
+                    imgSrc = "";
+                  }
+                  return (
+                    <span key={i} className={styles.roleTagWithImage}>
+                      {imgSrc && (
+                        <img
+                          src={imgSrc}
+                          alt={stack}
+                          className={styles.stackIcon}
+                        />
+                      )}
+                      {stack}
+                    </span>
+                  );
+                })}
                 {job.stackList?.length > 3 && (
-                  <span className={styles.stackItem}>
+                  <span className={styles.roleTagWithImage}>
                     +{job.stackList.length - 3}
                   </span>
                 )}
@@ -350,9 +416,11 @@ const Home = () => {
           {banners.map((banner, index) => (
             <img
               key={index}
-              src={banner}
+              src={banner.image}
               alt={`배너 이미지 ${index + 1}`}
               className={styles.bannerImage}
+              onClick={() => navigate(`/Post/${banner.projectId}`)}
+              style={{ cursor: "pointer" }}
             />
           ))}
         </div>
@@ -420,34 +488,44 @@ const Home = () => {
           selectedStacks={selectedStacks}
           setSelectedStacks={setSelectedStacks}
           onClose={() => setIsSearchOpen(false)}
-          onApply={() => setIsSearchOpen(false)}
+          onApply={() => {
+            setIsSearchOpen(false);
+            const params = new URLSearchParams();
+            selectedStacks.forEach((stack) => {
+              params.append("stacks", stack);
+            });
+            params.append("search", "1");
+            navigate(`/project?${params.toString()}`);
+          }}
         />
       )}
 
       {/* 하단 모집 버튼 */}
       <Link to="/CreatePost">
-      <button
-        className={classNames(styles.Match2, styles.fixed, {
-          [styles.hidden]: isHidden,
-        })}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <span style={{ fontSize: "16px" }}>마음에 드는 프로젝트가 없다면?</span>
-        <span style={{ fontSize: "24px", fontWeight: "bold" }}>모집하기!</span>
-      </button>
+        <button
+          className={classNames(styles.Match2, styles.fixed, {
+            [styles.hidden]: isHidden,
+          })}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <span style={{ fontSize: "16px" }}>
+            마음에 드는 프로젝트가 없다면?
+          </span>
+          <span style={{ fontSize: "24px", fontWeight: "bold" }}>
+            모집하기!
+          </span>
+        </button>
       </Link>
 
       {/* 알람 버튼 */}
       <div className={styles.alarmWrapper}>
         <button className={styles.alarmButton} onClick={toggleAlarm}></button>
-        {notiCount > 0 && (
-          <div className={styles.badge}>{notiCount}</div>
-        )}
+        {notiCount > 0 && <div className={styles.badge}>{notiCount}</div>}
       </div>
       <AlarmButton isOpen={isAlarmOpen} onClose={() => setIsAlarmOpen(false)} />
 
