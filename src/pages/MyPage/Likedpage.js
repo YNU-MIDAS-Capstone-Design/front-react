@@ -116,8 +116,8 @@ function Likedpage(){
                         <p style={{fontSize:"24px", fontWeight:"700", marginBottom:"25px"}}>내 활동</p>
                         <div style={{display:"flex", justifyContent:"left", alignItem:"center"}}>
                                 <p onClick={() => {setClick(1); fetchPost();}} className={click===1 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>작성한 글</p>
-                                <p onClick={() => {setClick(2); fetchlikes();}} className={click===2 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>지원한 글</p>
-                                <p onClick={() => {setClick(3); fetchapply();}} className={click===3 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>좋아요</p>
+                                <p onClick={() => {setClick(2); fetchapply();}} className={click===2 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>지원한 글</p>
+                                <p onClick={() => {setClick(3); fetchlikes();}} className={click===3 ? `${styles.active_btn} ${styles.click}` : `${styles.active_btn}`}>좋아요</p>
                                 <p style={{width:"730px", borderBottom:"1px solid rgba(0,0,0,0.2)"}}></p>
                         </div>
                     </div>
