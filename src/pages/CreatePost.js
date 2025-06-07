@@ -1,4 +1,4 @@
-import { useState ,useEffect } from "react";
+import { useState ,useEffect, useLayoutEffect, useRef } from "react";
 import styles from "../style/CreatePost.module.css";
 import stackStyles from "../style/Post.module.css";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -15,6 +15,7 @@ const CreatePost =()=> {
     const { projectId } = useParams();
 
     const navigate = useNavigate();
+    const textareaRef = useRef();
     const token = localStorage.getItem("accessToken")
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [selectedStacks, setSelectedStacks] = useState([]);
@@ -26,13 +27,20 @@ const CreatePost =()=> {
     const [projectInfo, setProjectInfo] = useState({
         title: "",
         content: "",
-        processing: "수정중",
+        processing: "모집중",
         recruitmentField: "",
         people: "",
         meet_location: "",
         stackList: []
     });
-        
+    
+    useLayoutEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+    }, [projectInfo.content]);
+
     useEffect(() => {
     if (!projectId) return;
 
@@ -175,7 +183,7 @@ const CreatePost =()=> {
                             <input className={styles.name} name = "people" value={projectInfo.people} type="number" placeholder="모집 인원" onChange={handleInput}/>
                         </div>
                         <div className={styles.row}>
-                            <span className={styles.name}>사용 기술</span>
+                            {projectId? null :(<><span className={styles.name}>사용 기술</span>
                             <button className={styles.filterButton} value={projectInfo.stackList} onClick={() => setIsSearchOpen(true)}>{"기술 선택 ▾"}</button>
                             {isSearchOpen && (
                                 <StackFilter
@@ -188,10 +196,11 @@ const CreatePost =()=> {
                             <div className={stackStyles.stackContainer}> {selectedStacks?.map((stack, index) => (
                                 <span key={index} className={stackStyles.stackBadge}>{stack}</span>
                             ))} </div>
+                            </>)}
                         </div>
                     </div>
                 </div>
-                <textarea className={styles.postContent} name="content" value={projectInfo.content} onInput={handleInput} placeholder="내용을 입력하시오."/>
+                <textarea ref={textareaRef} className={styles.postContent} name="content" value={projectInfo.content} onInput={handleInput} placeholder="내용을 입력하시오."/>
             </div>
             <button className={styles.submit} onClick={createProject}>{projectId ? "수정하기" : "등록하기"}</button>
         </div>

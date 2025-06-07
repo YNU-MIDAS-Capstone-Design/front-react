@@ -6,26 +6,28 @@ import Box from "@mui/material/Box";
 import classNames from "classnames";
 import axios from "axios";
 
-const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
+const AuthPostSideBar = ({ isAuthor, token , projectId, processing}) => {
   const [modalType, setModalType] = useState(""); // 모달 타입: 'share', 'volunteer', 'addUser'
   const [selectedUser, setSelectedUser] = useState(""); // addUser용
   const [active, setActive] = useState("");
   const [volunteered , setVolunteered] = useState(false);
   const [applicants, setApplicants] = useState([]); 
+  const currentUrl = window.location.href; // 공유하기기
 
   const getApplicants = () =>{
-    axios.get(`/api/project/${projectId}/applicants`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((res)=>{
-      console.log(res.data)
-      setApplicants(res.data.applicants);
-    })
-    .catch((err) => {
-    console.error("지원자 정보를 불러오는 데 실패했습니다:", err);
-   });
+    if(isAuthor == true){
+      axios.get(`/api/project/${projectId}/applicants`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res)=>{
+        setApplicants(res.data.applicants);
+      })
+      .catch((err) => {
+      console.error("지원자 정보를 불러오는 데 실패했습니다:", err);
+      });
+    }
   }
 
   useEffect(() => {
@@ -102,11 +104,9 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
         if (volunteered === false) alert("지원 완료!");
         else alert("지원 취소");
         setVolunteered((prev)=>!prev);
-        console.log("지원 확인");
       })
       .catch(()=>{
-        console.log("보내는 토큰:", token);
-        console.log("지원 안됨");
+        alert("다시 시도해주세요");
       })
   }
 
@@ -120,10 +120,19 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
       if(volunteered) setVolunteered((prev)=>!prev);
     })
     .catch((err)=>{
-      console.log(err.response.status);
+      alert("다시 시도해주세요.");
     })
   }
 
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(currentUrl)
+    .then(() => {
+        alert('클립보드에 복사되었습니다');
+    })
+    .catch((error) => {
+        alert('클립보드 복사 실패!');
+    });
+  }
   // 모달 열기
   const openModal = (type, user = "") => {
     setModalType(type);
@@ -138,7 +147,7 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
   const handleConfirm = () => {
     switch (modalType) {
       case "share":
-        console.log("공유하기 실행");
+        handleCopyUrl();
         break;
       case "volunteer":
         if(volunteered) toggleCancel();
@@ -185,7 +194,9 @@ const AuthPostSideBar = ({ isAuthor, token , projectId}) => {
         ) : (
           <div className={styles.menu}>
             <button className={styles.button} onClick={() => openModal("share")}>공유</button>
-            <button className={styles.button} onClick={() => openModal("volunteer")}>{volunteered ? "지원 취소": "지원"}</button>
+            {processing == "모집완료" ? null:(
+              <button className={styles.button} onClick={() => openModal("volunteer")}>{volunteered ? "지원 취소": "지원"}</button>
+            ) }
             <button className= {classNames(styles.starButton, {[styles.active]:active})} onClick={toggleLike}> ★ </button>
           </div>
         )}

@@ -97,11 +97,11 @@ const Register = () => {
       <>
       <div className={styles.wrapper}>
           <div style={{fontWeight: "bold", fontSize: "36px"}}>회원가입</div>
-          <div className={styles.registerBox}
-          // onSubmit={(e)=>{
-          //   e.preventDefault();
-          //   register(e);
-          // }}
+          <form className={styles.registerBox}
+          onSubmit={(e)=>{
+            e.preventDefault();
+            register(e);
+          }}
           >
               <div className={styles.infoBox}>
                   <input type = "text" name="nickname" value={form.nickname} placeholder="Enter your name" className={styles.infoItem} onChange={handleChange}/>
@@ -122,7 +122,7 @@ const Register = () => {
                   Already have account?
                   <a href="/login" className={styles.loginLink}>Log in</a>
               </div>
-          </div>
+          </form>
       </div>
       </>
   )

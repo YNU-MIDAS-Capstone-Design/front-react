@@ -347,6 +347,7 @@
   color: #666;
   text-align: left;
   line-height: 1.4;
+  flex-grow: 1;
   margin-bottom: 8px;
   display: -webkit-box;
   display: box;

@@ -107,7 +107,7 @@ function Team(){
       }
 
       //중복 검사
-      const isDuplicate = team.some(t => t.team_name === newTeamName);
+      const isDuplicate = Array.isArray(team) && team.some(t => t.team_name === newTeamName);
       if (isDuplicate) {
         alert("이미 존재하는 팀 이름입니다. 다른 이름을 입력해주세요.");
         return;

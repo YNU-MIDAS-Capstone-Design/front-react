@@ -14,9 +14,9 @@ const AlarmButton = ({ isOpen, onClose }) => {
     <div className={styles.bottomPanel}>
       <div className={styles.tabContent}>
         {activeTab === "notification" && <NotificationModal />}
-        {activeTab === "chat" && <ChatBubbleOutlineRoundedIcon />}
+        {/* {activeTab === "chat" && <ChatBubbleOutlineRoundedIcon />} */}
       </div>
-      <div className={styles.tabButtons}>
+      {/* <div className={styles.tabButtons}>
         <button
           className={`${styles.tabButton} ${activeTab === "notification" ? styles.active : ""}`}
           onClick={() => setActiveTab("notification")}
@@ -29,7 +29,7 @@ const AlarmButton = ({ isOpen, onClose }) => {
         >
           <ChatBubbleOutlineRoundedIcon/>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

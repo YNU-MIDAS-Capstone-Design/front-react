@@ -10,8 +10,6 @@ const Post = () =>{
     const navigate = useNavigate();
     const [isAuthor, setIsAuthor] = useState(); // 작성자 여부 상태
     const { projectId } = useParams();
-    // const data = { projectId: 1 };
-    // const { projectId } = data;
     const [project, setProject] = useState(null);
     const [userNickname ,setUserNickname] = useState();
     const [comments , setComments] = useState([]);
@@ -58,6 +56,30 @@ const Post = () =>{
         // 프로젝트 댓글 보기
         fetchComments();
     }, [userNickname, projectId, token]);
+
+    const projectCompletedBtn = () =>{
+        if (!isAuthor) return;
+
+        const payload = {
+            ...project,
+            processing: "모집완료",
+        };
+
+        axios.put(`/api/project/${projectId}/edit`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(() => {
+                alert("상태가 변경되었습니다!");
+                navigate(`/Post/${Number(projectId)}`);
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("수정 실패");
+            });
+        
+    }
 
     const fetchComments =()=>{
         axios.get(`/api/project/${projectId}/comment/list`,{
@@ -156,10 +178,16 @@ const Post = () =>{
                         <div>작성 일 {project?.createdAt.split("T")[0]}</div>
                         <div>{project?.processing}</div>
                         {isAuthor ? (
+                            project.processing == "모집완료" ? (
+                                <button className={styles.authorBtn} onClick={deleteProjectPost}>삭제</button>
+                            ):
+                            (
                             <div className={styles.authorAction}>
-                            <button className={styles.authorBtn} onClick={() => navigate(`/CreatePost/edit/${projectId}`)}>수정</button>
-                            <button className={styles.authorBtn} onClick={deleteProjectPost}>삭제</button>
+                                <button className={styles.authorBtn} onClick={projectCompletedBtn}>모집 완료 | </button>
+                                <button className={styles.authorBtn} onClick={() => navigate(`/CreatePost/edit/${projectId}`)}>수정</button>
+                                <button className={styles.authorBtn} onClick={deleteProjectPost}>삭제</button>
                             </div>
+                            )
                         ) : null}
                     </div>
                     <div className={styles.content}>
@@ -246,7 +274,7 @@ const Post = () =>{
                 </div>
             </div>
             <aside className={styles.sideBar}>
-                <AuthPostSideBar isAuthor={isAuthor} token={token} projectId = {projectId}/>
+                <AuthPostSideBar isAuthor={isAuthor} token={token} projectId = {projectId} processing = {project.processing}/>
             </aside>
         </div>
         </>

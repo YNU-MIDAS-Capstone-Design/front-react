@@ -40,7 +40,11 @@ const ProjectRecruitmentCard = ({
       <header className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>{title}</h2>
       </header>
-      <p className={styles.cardDescription}>{description}</p>
+      <p className={styles.cardDescription}>{description ?
+                (description.split(/[.!?]/)[0].length> 90
+                ? description.slice(0, 90) + "..."
+                : description.split(/[.!?]/)[0])
+                : (description)}</p>
 
       {/* 여기부터 기존 역할 태그 대신 바뀜 */}
       <div className={styles.roleTags}>

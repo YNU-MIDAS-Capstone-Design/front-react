@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
   const logoutAuth = () => {
     localStorage.removeItem("accessToken");
     setToken(null);
+    window.location.reload();
   };
 
   return (

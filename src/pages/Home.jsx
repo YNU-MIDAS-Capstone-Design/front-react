@@ -360,7 +360,13 @@ const Home = () => {
               </button>
 
               <h3 className={styles.jobTitle}>{job.title}</h3>
-              <p className={styles.jobDescription}>{job.content}</p>
+              <p className={styles.jobDescription}>{
+              job.content ?
+                (job.content.split(/[.!?]/)[0].length> 90
+                ? job.content.slice(0, 90) + "..."
+                : job.content.split(/[.!?]/)[0])
+                : (job.description)
+              }</p>
               <div
                 className={styles.stackList}
                 style={{
