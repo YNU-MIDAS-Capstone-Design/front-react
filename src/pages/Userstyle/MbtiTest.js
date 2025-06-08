@@ -138,11 +138,10 @@ function MbtiTest() {
     const token = localStorage.getItem("accessToken");
     if (!token) {
       console.warn("로그인이 필요합니다.");
-      return;
+      return false;
     }
 
     const { stacks, career, location: userLocation } = location.state;
-
     const payload = {
       techStacks: stacks,
       job: career,
@@ -154,11 +153,11 @@ function MbtiTest() {
       const res = await axios.patch("/api/users/me", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       console.log("프로필 저장 성공:", res.data);
-      navigate("/mypage");
+      return true;
     } catch (err) {
       console.error("프로필 저장 실패:", err);
+      return false;
     }
   };
 
@@ -169,7 +168,11 @@ function MbtiTest() {
           <>
             <p className={styles.title}>당신의 MBTI 성향을 알려주세요</p>
             <div className={styles.DoneBox} style={{ flexDirection: "column" }}>
-              <img src={mbti} alt="MBTI illustration" style={{ width: "300px", marginBottom: "20px" }} />
+              <img
+                src={mbti}
+                alt="MBTI illustration"
+                style={{ width: "300px", marginBottom: "20px" }}
+              />
               <div className={styles.DoneButton} onClick={handleNext}>
                 MBTI 검사 시작하기
               </div>
@@ -177,38 +180,68 @@ function MbtiTest() {
           </>
         )}
 
-        {currentQuestion >= 0 && currentQuestion < questions.length && !result && (
-          <>
-            <div className={styles.StageBox}>
-              {questions.map((_, i) => (
-                <div key={i} className={`${styles.StageDot} ${i < answers.filter(Boolean).length ? styles.Buttonclick : ""}`}>
-                  {i + 1}
-                </div>
-              ))}
-            </div>
-            <div className={styles.MiddleBox} style={{ flexDirection: "column", alignItems: "center" }}>
-              <p style={{ fontSize: "22px", fontWeight: "bold" }}>{questions[currentQuestion].text}</p>
-              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px", marginTop: "20px" }}>
-                {questions[currentQuestion].options.map((opt) => (
+        {currentQuestion >= 0 &&
+          currentQuestion < questions.length &&
+          !result && (
+            <>
+              <div className={styles.StageBox}>
+                {questions.map((_, i) => (
                   <div
-                    key={opt.id}
-                    className={`${styles.Button} ${answers[currentQuestion]?.id === opt.id ? styles.Buttonclick : ""}`}
-                    onClick={() => handleSelect(opt.id, opt.type)}
+                    key={i}
+                    className={`${styles.StageDot} ${
+                      i < answers.filter(Boolean).length
+                        ? styles.Buttonclick
+                        : ""
+                    }`}
                   >
-                    {opt.text}
+                    {i + 1}
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className={styles.DoneBox}>
-              <div className={styles.DoneButton} onClick={handleBack}>이전</div>
-              <div className={styles.DoneButton} onClick={handleNext}>
-                {currentQuestion === questions.length - 1 ? "결과 보기" : "다음"}
+              <div
+                className={styles.MiddleBox}
+                style={{ flexDirection: "column", alignItems: "center" }}
+              >
+                <p style={{ fontSize: "22px", fontWeight: "bold" }}>
+                  {questions[currentQuestion].text}
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
+                    gap: "12px",
+                    marginTop: "20px",
+                  }}
+                >
+                  {questions[currentQuestion].options.map((opt) => (
+                    <div
+                      key={opt.id}
+                      className={`${styles.Button} ${
+                        answers[currentQuestion]?.id === opt.id
+                          ? styles.Buttonclick
+                          : ""
+                      }`}
+                      onClick={() => handleSelect(opt.id, opt.type)}
+                    >
+                      {opt.text}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </>
-        )}
+
+              <div className={styles.DoneBox}>
+                <div className={styles.DoneButton} onClick={handleBack}>
+                  이전
+                </div>
+                <div className={styles.DoneButton} onClick={handleNext}>
+                  {currentQuestion === questions.length - 1
+                    ? "결과 보기"
+                    : "다음"}
+                </div>
+              </div>
+            </>
+          )}
 
         {result && (
           <>
@@ -218,10 +251,23 @@ function MbtiTest() {
               </p>
             </div>
             <div className={styles.DoneBox}>
-              <div className={styles.DoneButton} onClick={handleSaveProfile}>
+              <div
+                className={styles.DoneButton}
+                onClick={async () => {
+                  const success = await handleSaveProfile();
+                  if (success) navigate("/mypage");
+                }}
+              >
                 프로필 저장하기
               </div>
-              <div className={styles.DoneButton} onClick={() => navigate("/")}>
+
+              <div
+                className={styles.DoneButton}
+                onClick={async () => {
+                  const success = await handleSaveProfile();
+                  if (success) navigate("/");
+                }}
+              >
                 홈으로 가기
               </div>
             </div>
