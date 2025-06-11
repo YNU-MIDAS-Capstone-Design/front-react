@@ -42,3 +42,35 @@
   padding: 16px;
   overflow-x: hidden;
 }
+
+@keyframes fadein{
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes fadeout{
+    from {
+		opacity: 1;
+    transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+    transform: translateY(30px);
+	}
+}
+
+.modalopen{
+    animation: fadein 0.3s; 
+    -webkit-animation: fadein 0.3s;
+}
+
+.modalclose{
+    animation: fadeout 0.3s; 
+    -webkit-animation: fadeout 0.3s;
+    animation-fill-mode: forwards;
+}
