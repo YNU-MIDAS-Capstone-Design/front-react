@@ -1,0 +1,13 @@
+.listbox {
+    height: 65px;
+    border-top: 1px solid #E9EAF3; 
+    display: flex;
+    justify-content: space-between;
+    color: #555F7E;
+}
+.listitem{
+    width: 120px;
+    display: flex;
+    align-items: center;
+    padding-left: 50px;
+}

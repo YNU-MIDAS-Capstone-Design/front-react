@@ -16,13 +16,15 @@ import MbtiTest from "./pages/Userstyle/MbtiTest";
 import UserStyle from "./pages/Userstyle/UserStyle";
 import Teamboard from "./pages/Community/Teamboard";
 import Whiteboard from './pages/Community/Whiteboard'; 
+import MemberManagement from './pages/Developers/MemberManagement'
 
 
 function App() {
   return (
     <Router>
-      <Template>
-        <Routes>
+      <Routes>
+        {/* ✅ Template이 필요한 페이지들 */}
+        <Route element={<Template />}>
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
@@ -38,10 +40,14 @@ function App() {
           <Route path="/team" element={<Team />} />
           <Route path="/user/:nickname" element={<Userpage />} />
           <Route path="/whiteboard/:teamId" element={<Whiteboard />} />
-          <Route path="/teamboard" element={<Teamboard/>} />
-        </Routes>
-      </Template>
+          <Route path="/teamboard" element={<Teamboard />} />
+        </Route>
+
+        {/* ❌ Template 없이 표시할 페이지 */}
+        <Route path="/Developer" element={<MemberManagement />} />
+      </Routes>
     </Router>
+
   );
 }
 
