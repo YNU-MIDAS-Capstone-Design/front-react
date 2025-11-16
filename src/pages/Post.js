@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate , useParams } from 'react-router-dom';
 
-const Post = () =>{
+const Post = ({mode = "user"}) =>{
     const navigate = useNavigate();
     const [isAuthor, setIsAuthor] = useState(); // 작성자 여부 상태
     const { projectId } = useParams();
@@ -213,6 +213,8 @@ const Post = () =>{
                 </div>
                 <div className={styles.postContent}>{project?.content}</div>
                 <div style={{marginTop:'100px'}}>
+                    {mode === "user" && (
+                    <>
                     <div className={commentStyles.commentInput}>
                         <div className={commentStyles.reply}>
                             댓글
@@ -271,11 +273,17 @@ const Post = () =>{
                             </li>
                         ))}
                     </ul>
+                    </>
+                    )}
                 </div>
             </div>
+            {mode === "user" && (
+            <>
             <aside className={styles.sideBar}>
                 <AuthPostSideBar isAuthor={isAuthor} token={token} projectId = {projectId} processing = {project.processing}/>
             </aside>
+            </>
+            )}
         </div>
         </>
     )

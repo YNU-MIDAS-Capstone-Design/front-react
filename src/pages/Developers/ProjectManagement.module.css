@@ -1,0 +1,17 @@
+.listbox {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.5fr;
+    align-items: center;
+    height: 65px;
+    border-top: 1px solid #E9EAF3;
+    color: #555F7E;
+    padding: 0 50px;
+    box-sizing: border-box;
+
+}
+.listitem{
+    padding: 0 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -18,8 +18,8 @@ function MemberManagement(){
     };
 
     return (
-        <div style={{display:"flex", backgroundColor:"#F5F5F5"}}>
-           <Sidebar></Sidebar>
+        <div style={{display:"flex", alignItems:"flex", backgroundColor:"#F5F5F5"}}>
+           {/* <Sidebar></Sidebar> */}
            <div style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
                 <div style={{width:"1260px", height:"640px",  boxShadow: "0 1px 5px 0 #0000001a, 0 1px 2px -1px #0000001a", borderRadius:"16px", backgroundColor:"white", padding:"10px 30px", boxSizing:"border-box", color:"#1C2A53"}}>
                     <h2>회원관리</h2>
