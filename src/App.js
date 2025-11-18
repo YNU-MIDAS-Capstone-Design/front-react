@@ -19,6 +19,7 @@ import Whiteboard from './pages/Community/Whiteboard';
 import AdminLayout from "./pages/Developers/AdminLayout";
 import MemberManagement from './pages/Developers/MemberManagement'
 import ProjectManagement from "./pages/Developers/ProjectManagement";
+import RequireAdmin from "./pages/Developers/RequireAdmin";
 
 function App() {
   return (
@@ -45,8 +46,12 @@ function App() {
         </Route>
 
         {/* ❌ Template 없이 표시할 페이지 */}
-        {/* <Route path="/Developer" element={<MemberManagement />} /> */}
-        <Route path="/Developer" element={<AdminLayout />}>
+        <Route
+        path="/Developer"
+        element={
+          <RequireAdmin >
+            <AdminLayout />
+          </RequireAdmin>}>
           <Route index element={<MemberManagement />} />
           <Route path="ProjectManagement" element={<ProjectManagement />} />
           <Route path="/Developer/project/:projectId" element={<div style={{boxShadow: "0 1px 5px 0 #0000001a, 0 1px 2px -1px #0000001a", borderRadius:"16px", backgroundColor:"white", padding:"10px 50px", boxSizing:"border-box", color:"#1C2A53"}}>

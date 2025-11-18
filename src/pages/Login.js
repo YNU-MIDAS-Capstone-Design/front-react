@@ -39,14 +39,15 @@ const Login = () => {
               'Content-Type': 'application/json'
             }   
           })
-          .then((res=>{
-            const token = res.data.token;
-            localStorage.setItem("accessToken", token);
-            // alert("로그인 되었습니다");
-            loginAuth(token);
-            navigate("/");
-          }))
-          .catch((err)=>{
+            .then(async (res) => {
+                const token = res.data.token;
+                await loginAuth(token);
+                if(res.data.role == "ADMIN")
+                    navigate("/Developer");
+                else
+                    navigate("/");
+            })
+            .catch((err)=>{
             if (err.response?.status === 400){
                 setErrorMessage("로그인 시간이 만료되었습니다. 다시 로그인해주세요.");
             }
